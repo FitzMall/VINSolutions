@@ -21,7 +21,7 @@ namespace VINSolutionsAPI.Models
         public string InteriorColor { get; set; }
         public string ExteriorColor { get; set; }
         public string Odometer { get; set; }
-        public string Price { get; set; }
+        public decimal? Price { get; set; }
         public bool IsPrimary { get; set; }
         public string RecordStatusCode { get; set; }
         public DateTime LastUpdatedUTCDate { get; set; }

@@ -10,7 +10,7 @@ namespace VINSolutionsAPI.Business
 {
     public static class SqlMapperUtil
     {
-        private static readonly string ConnectionString = ConfigurationManager.ConnectionStrings["JJFServer"].ConnectionString;
+        private static readonly string ConnectionString = ConfigurationManager.ConnectionStrings["DBServer196"].ConnectionString;
         //public static string CustomConnectionString { get; set; }
 
         public static SqlConnection GetOpenConnection(string connStr = null)

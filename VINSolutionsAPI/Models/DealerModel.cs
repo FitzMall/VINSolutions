@@ -16,7 +16,7 @@ namespace VINSolutionsAPI.Models
         public string DealerPostalCode { get; set; }
         public string DealerCountry { get; set; }
         public string RecordStatusCode { get; set; }
-        public DateTime LastUpdatedUTCDate { get; set; }
+        public DateTime? LastUpdatedUTCDate { get; set; }
 
     }
 }

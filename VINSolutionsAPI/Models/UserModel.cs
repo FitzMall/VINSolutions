@@ -15,6 +15,6 @@ namespace VINSolutionsAPI.Models
         public string LastClockOutUTCDate { get; set; }
         public string LastMobileLoginDLTDate { get; set; }
         public string LastBrowserLoginDLTDate { get; set; }
-        public DateTime LastUpdatedUTCDate { get; set; }
+        public DateTime? LastUpdatedUTCDate { get; set; }
     }
 }

@@ -3,12 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using NLog;
+using System.Globalization;
+
 
 namespace VINSolutionsAPI.Controllers
 {
     public class HomeController : Controller
     {
-        public ActionResult Index()
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
+
+        public ActionResult Index(string bkdays)
+        {
+            return View();
+        }
+        public JsonResult Appointment(string bkdays)
         {
 
             //var dealers = Business.APIHelper.GetDealers();
@@ -33,8 +42,16 @@ namespace VINSolutionsAPI.Controllers
             //var success2 = Business.SQLQueries.InsertOrUpdateLeadStatusCustom(leadStatusCustom);
 
             var errorMessages = "";
+            int numberofdays = 1;
+            if (!string.IsNullOrEmpty(bkdays))
+            {
+                numberofdays = Convert.ToInt32(bkdays);
+            }
 
-            var dataDate = new DateTime(2017,5,31);
+            var dataDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day).AddDays(-numberofdays);
+
+            // var dataDate = new DateTime(2017,7,04);
+            // var dataDate = new DateTime("2017-07-26");
             var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
 
             var startDate = new DateTime();
@@ -43,180 +60,20 @@ namespace VINSolutionsAPI.Controllers
             var bContinue = true;
             var runCount = 0;
 
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var appointments = Business.APIHelper.GetAppointments(startDate, endDate, ref errorMessages);
-            //        if (appointments != null && appointments.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateAppointment(appointments, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var transactions = Business.APIHelper.GetCRMSoldTransactions(startDate, endDate, ref errorMessages);
-
-            //        if (transactions != null && transactions.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateCRMSoldTransaction(transactions, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var transactions = Business.APIHelper.GetDMSSoldTransactions(startDate, endDate, ref errorMessages);
-            //        if (transactions != null && transactions.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateDMSSoldTransaction(transactions, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //var missedDates = string.Empty;
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var customers = Business.APIHelper.GetCustomers(startDate, endDate, ref errorMessages);
-            //        if (customers != null && customers.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateCustomer(customers, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            missedDates += endDate + ",";
-            //        }
-
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-            
-            endDate = new DateTime(2017,6,29);
-            startDate = new DateTime(2017,6,23);
-            //startDate = endDate.AddDays(-1);
-            bContinue = true;
-            runCount = 0;
+            Logger.Info("Daily Load Start..." + DateTime.Now);
+            Logger.Info("Load data appointment=>> start" + DateTime.Now);
 
             do
             {
-                if (endDate > startDate)
+                if (endDate > dataDate)
                 {
-                    var inventory = Business.APIHelper.GetInventory(startDate, endDate, ref errorMessages);
-                    if (inventory != null && inventory.Count() > 0)
+                    var appointments = Business.APIHelper.GetAppointments(startDate, endDate, ref errorMessages);
+
+                    if (appointments != null && appointments.Count() > 0)
                     {
                         try
                         {
-                            var success = Business.SQLQueries.InsertOrUpdateInventory(inventory, ref errorMessages);
+                            var success = Business.SQLQueries.InsertOrUpdateAppointment(appointments, ref errorMessages);
                         }
                         catch (Exception ex)
                         {
@@ -226,11 +83,12 @@ namespace VINSolutionsAPI.Controllers
                     }
                     else
                     {
-                        //missedDates += endDate + ",";
+                        //bContinue = false;
                     }
                     endDate = startDate;
                     startDate = endDate.AddDays(-1);
                     runCount += 1;
+
                 }
                 else
                 {
@@ -239,259 +97,117 @@ namespace VINSolutionsAPI.Controllers
 
 
             } while (bContinue);
+            Logger.Info("Load data appointment=>> end" + DateTime.Now);
 
+            return Json("Success", JsonRequestBehavior.AllowGet);
 
-            ////GET ALL THE LEAD DATA
+        }
+   
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="entityname">examples: appointment;crmsold;customer;dmssold;lead;inventory;leadtradeinv;leadvofinterest;
+        /// servicevisit;sroomvisit;task
+        /// dealer;user;useraccess; leadsource; leadstatus;leadstatuscustom
+        /// </param>
+        /// <param name="sdate"></param>
+        /// <param name="edate"></param>
+        /// <returns></returns>
+        public JsonResult getvindata(string entityname, string sdate, string edate)
+        {
+            var errorMessages = "";
+            Int32 numberofDays;
+            DateTime mySdate;
+            DateTime myEdate;
+            //regular load one day data
+            if (string.IsNullOrEmpty(sdate) && string.IsNullOrEmpty(edate))
+            {
+                var endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
 
+                var startDate = new DateTime();
+                startDate = endDate.AddDays(-1);
+                //load yesterday data...
+                Logger.Info("Load data started: " + DateTime.Now + " ***entityname***=" + entityname);
+                Business.APIHelper.makePull(entityname, startDate, endDate);
+                Logger.Info("Load data finish: " + DateTime.Now);
+                return Json("Success!", JsonRequestBehavior.AllowGet);
+            }
 
-            //missedDates = string.Empty;
+            try
+            {
+                 mySdate = DateTime.ParseExact(sdate, "yyyyMMdd", CultureInfo.InvariantCulture);
+                 myEdate = DateTime.ParseExact(edate, "yyyyMMdd", CultureInfo.InvariantCulture);
+                 numberofDays = Convert.ToInt32((myEdate - mySdate).TotalDays);
+            }
+            catch (Exception ex)
+            {
+               // Logger.Info("Load data Task=>> end: " + DateTime.Now);
+                return Json("Date Format must be yyyyMMdd", JsonRequestBehavior.AllowGet);
+            }
 
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
+            if (numberofDays < 0 )
+            {
+                return Json("Start date must be before end date! No Data was loaded", JsonRequestBehavior.AllowGet);
+            }
+            else
+            {
+                Logger.Info("Load data started: " + DateTime.Now + " ***entityname***=" + entityname);
+                if (numberofDays < 14 )
+                {
+                    ////just pass the startdate and end date to vin api
+                    Business.APIHelper.makePull(entityname, mySdate, myEdate);
+                    //Business.APIHelper.makePull("appointment", mySdate, myEdate);
+                    //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
+                    //Business.APIHelper.makePull("customer", mySdate, myEdate);
+                    //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
+                    //Business.APIHelper.makePull("inventory", mySdate, myEdate);
+                    //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
+                    //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
+                    //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
+                    //Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
 
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var leads = Business.APIHelper.GetLeads(startDate, endDate, ref errorMessages);
+                }
+                else
+                {
+                    Int32 div = numberofDays / 10;
+                    Int32 mod = numberofDays % 10;
 
-            //        if (leads != null && leads.Count() > 0)
-            //        {
+                    for (int i=0; i<div; i++)
+                    {
+                        //api call by calculate date
+                        mySdate = myEdate.AddDays(-10);
+                        Business.APIHelper.makePull(entityname, mySdate, myEdate);
+                        //Business.APIHelper.makePull("appointment", mySdate, myEdate);
+                        //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
+                        //Business.APIHelper.makePull("customer", mySdate, myEdate);
+                        //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
+                        //Business.APIHelper.makePull("inventory", mySdate, myEdate);
+                        //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
+                        //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
+                        //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
+                        // Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
+                        myEdate = mySdate;
+                    }
 
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateLead(leads, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            missedDates += endDate + ",";
-            //        }
-
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var vehicles = Business.APIHelper.GetLeadTradeInVehicles(startDate, endDate, ref errorMessages);
-            //        if (vehicles != null && vehicles.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateLeadTradeInVehicle(vehicles, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var vehicles = Business.APIHelper.GetLeadVehicleOfInterest(startDate, endDate, ref errorMessages);
-            //        if (vehicles != null && vehicles.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateLeadVehicleOfInterest(vehicles, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            missedDates += endDate + ",";
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var visits = Business.APIHelper.GetServiceVisit(startDate, endDate, ref errorMessages);
-            //        if (visits != null && visits.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateServiceVisit(visits, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-            //        var visits = Business.APIHelper.GetShowroomVisit(startDate, endDate, ref errorMessages);
-            //        if (visits != null && visits.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateShowroomVisit(visits, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-
-            //endDate = new DateTime(DateTime.Now.Year, DateTime.Now.Month, DateTime.Now.Day);
-            //startDate = new DateTime();
-            //startDate = endDate.AddDays(-1);
-            //bContinue = true;
-            //runCount = 0;
-
-
-            //do
-            //{
-            //    if (endDate > dataDate)
-            //    {
-
-            //        var tasks = Business.APIHelper.GetTasks(startDate, endDate, ref errorMessages);
-            //        if (tasks != null && tasks.Count() > 0)
-            //        {
-            //            try
-            //            {
-            //                var success = Business.SQLQueries.InsertOrUpdateTask(tasks, ref errorMessages);
-            //            }
-            //            catch (Exception ex)
-            //            {
-            //                var error = ex.Message;
-            //            }
-            //        }
-            //        else
-            //        {
-            //            //bContinue = false;
-            //        }
-            //        endDate = startDate;
-            //        startDate = endDate.AddDays(-1);
-            //        runCount += 1;
-            //    }
-            //    else
-            //    {
-            //        bContinue = false;
-            //    }
-
-
-            //} while (bContinue);
-
-            //What does errorMessages hold?
-
-            return View();
+                   if (mod>0)
+                    {
+                        mySdate = myEdate.AddDays(-mod);
+                        Business.APIHelper.makePull(entityname, mySdate, myEdate);
+                        //Business.APIHelper.makePull("appointment", mySdate, myEdate);
+                        //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
+                        //Business.APIHelper.makePull("customer", mySdate, myEdate);
+                        //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
+                        //Business.APIHelper.makePull("inventory", mySdate, myEdate);
+                        //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
+                        //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
+                        //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
+                        //Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
+                    }
+                }
+            }
+      
+            Logger.Info("Load data end=>> end: " + DateTime.Now);
+            return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
         public ActionResult About()

@@ -8,6 +8,8 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
 using VINSolutionsAPI.Models;
+using NLog;
+
 
 namespace VINSolutionsAPI.Business
 {
@@ -16,6 +18,8 @@ namespace VINSolutionsAPI.Business
 
         public static string VINSolutionsBaseURL = ConfigurationManager.AppSettings["VINSolutionsBaseURL"].ToString();
         public static string VINSolutionsAPIKey = ConfigurationManager.AppSettings["VINSolutionsAPIKey"].ToString();
+
+        private static readonly ILogger Logger = LogManager.GetCurrentClassLogger();
 
         public static IEnumerable<AppointmentModel> GetAppointments(DateTime startDate, DateTime endDate, ref string errorMessage)
         {
@@ -45,14 +49,17 @@ namespace VINSolutionsAPI.Business
                 else
                 {
                     errorMessage = errorMessage + "Appointments API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
-                }
-                
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin Api Call failed:" + errorMessage );
+                  
+                }             
 
                 return null;
             }
             catch(Exception ex)
             {
                 errorMessage = errorMessage + "Appointments API - " + ex.Message + "/n";
+                Logger.Error("Error: Appointments API failed:" + errorMessage);
                 return null;
             }
         }
@@ -86,6 +93,8 @@ namespace VINSolutionsAPI.Business
                 else
                 {
                     errorMessage = errorMessage + "CRMSoldTransactions API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin Api Call failed:" + errorMessage);
                 }
 
                 return null;
@@ -93,6 +102,7 @@ namespace VINSolutionsAPI.Business
             catch(Exception ex)
             {
                 errorMessage = errorMessage + "CRMSoldTransactions API - " + ex.Message + "/n";
+                Logger.Error("Error: CRMSoldTransactions API failed:" + errorMessage);
                 return null;
             }
         }
@@ -102,45 +112,40 @@ namespace VINSolutionsAPI.Business
 
             try
             { 
-            var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
-            var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
-            //LastUpdatedStartUTC=2016-12-18T12:00:00
+                var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
+                var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
+                //LastUpdatedStartUTC=2016-12-18T12:00:00
 
-            var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
-            //var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDate.ToUniversalTime() + "&LastUpdatedEndUTC=" + endDate.ToUniversalTime();
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Customer/1.0");
+                var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
+                //var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDate.ToUniversalTime() + "&LastUpdatedEndUTC=" + endDate.ToUniversalTime();
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Customer/1.0");
 
-                //client.DefaultRequestHeaders.AcceptCharset.Add()
-                // Add an Accept header for JSON format.     
+                    //client.DefaultRequestHeaders.AcceptCharset.Add()
+                    // Add an Accept header for JSON format.     
                 client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
                 client.DefaultRequestHeaders.Accept.Add(
-               new MediaTypeWithQualityHeaderValue("application/json"));
-                
-                
+                   new MediaTypeWithQualityHeaderValue("application/json"));               
 
                 // List data response.
-
                 HttpResponseMessage response = new HttpResponseMessage();
                 response.Headers.Add("charset", "utf-8");
                 response = client.GetAsync(urlParameters).Result;  // Blocking call!
 
                 response.Content.Headers.ContentType.CharSet = "utf-8";
                 if (response.IsSuccessStatusCode)
-            {
+                {
                     // Parse the response body. Blocking!
-
-                    string jsonString = response.Content.ReadAsStringAsync().Result;
-
-                //var returnModels = response.Content.ReadAsAsync<IEnumerable<CustomerModel>>().Result;
-
+                    string jsonString = response.Content.ReadAsStringAsync().Result;                  
                     var returnModels = JsonConvert.DeserializeObject<IEnumerable<CustomerModel>>(jsonString);
-
+                  
                     return returnModels;
-            }
+                }
                 else
                 {
                     errorMessage = errorMessage + "Customer API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin Api Call failed:" + errorMessage);
                 }
                 return null;
 
@@ -155,23 +160,30 @@ namespace VINSolutionsAPI.Business
 
         public static IEnumerable<DealerModel> GetDealers()
         {
+            try {
+                    var urlParameters = "?api_key=" + VINSolutionsAPIKey; //+ "&LastUpdatedStartUTC=" + startDate.ToUniversalTime() + "&LastUpdatedEndUTC=" + endDate.ToUniversalTime();
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Dealer/1.0");
 
-            var urlParameters = "?api_key=" + VINSolutionsAPIKey; //+ "&LastUpdatedStartUTC=" + startDate.ToUniversalTime() + "&LastUpdatedEndUTC=" + endDate.ToUniversalTime();
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Dealer/1.0");
+                    // Add an Accept header for JSON format.
+                    client.DefaultRequestHeaders.Accept.Add(
+                    new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<DealerModel>>().Result;
-                return returnModels;
-            }
+                    // List data response.
+                    HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                    if (response.IsSuccessStatusCode)
+                    {
+                        // Parse the response body. Blocking!
+                        var returnModels = response.Content.ReadAsAsync<IEnumerable<DealerModel>>().Result;
+                        return returnModels;
+                    }
+                }
+                catch (Exception ex)
+                {
+               
+                    Logger.Error("Error: Dealer API failed:" + ex.Message);
+                    return null;
+                }
 
             return null;
 
@@ -181,35 +193,38 @@ namespace VINSolutionsAPI.Business
         {
             try
             { 
-            var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
-            var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
-            //LastUpdatedStartUTC=2016-12-18T12:00:00
+                var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
+                var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
+                //LastUpdatedStartUTC=2016-12-18T12:00:00
 
-            var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(VINSolutionsBaseURL + "/DMSSoldTransaction/1.0");
+                var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(VINSolutionsBaseURL + "/DMSSoldTransaction/1.0");
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<DMSSoldTransactionModel>>().Result;
-                return returnModels;
-            }
-                else
-                {
-                    errorMessage = errorMessage + "DMSSoldTransaction API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
-                }
-                return null;
+                // List data response.
+                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                if (response.IsSuccessStatusCode)
+                    {
+                        // Parse the response body. Blocking!
+                        var returnModels = response.Content.ReadAsAsync<IEnumerable<DMSSoldTransactionModel>>().Result;
+                        return returnModels;
+                    }
+                    else
+                    {
+                        errorMessage = errorMessage + "DMSSoldTransaction API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                        Logger.Error("Error***" + DateTime.Now);
+                        Logger.Error("Error: Vin Api Call failed:" + errorMessage);
+                    }
+                    return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "DMSSoldTransaction API - " + ex.Message + "/n";
+                Logger.Error("Error: DMSSoldTransaction API failed:" + errorMessage);
                 return null;
             }
         }
@@ -217,37 +232,41 @@ namespace VINSolutionsAPI.Business
         public static IEnumerable<InventoryModel> GetInventory(DateTime startDate, DateTime endDate, ref string errorMessage)
         {
             try
-            { 
-            var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T00:00:00";
-            var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T00:00:00";
-            //LastUpdatedStartUTC=2016-12-18T12:00:00
-
-            var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
-            HttpClient client = new HttpClient();
-            client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Inventory/1.0");
-
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
             {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<InventoryModel>>().Result;
-                return returnModels;
-            }
+                //var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T00:00:00";
+                // var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T00:00:00";
+                var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
+                var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
+                //LastUpdatedStartUTC=2016-12-18T12:00:00
+
+                var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
+                HttpClient client = new HttpClient();
+                client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Inventory/1.0");
+
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+
+                // List data response.
+                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body. Blocking!
+                    var returnModels = response.Content.ReadAsAsync<IEnumerable<InventoryModel>>().Result;
+                    return returnModels;
+                }
                 else
                 {
-                    errorMessage = errorMessage + "Inventory API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                        errorMessage = errorMessage + "Inventory API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                        Logger.Error("Error***" + DateTime.Now);
+                        Logger.Error("Error: Vin Api Call failed:" + errorMessage);
                 }
-                return null;
+                    return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "Inventory API - " + ex.Message + "/n";
-
+                Logger.Error("Error: Inventory API failed:" + errorMessage);
                 return null;
             }
         }
@@ -280,13 +299,15 @@ namespace VINSolutionsAPI.Business
                 else
                 {
                     errorMessage = errorMessage + "Leads API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin Lead Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "Leads API - " + ex.Message + "/n";
-
+                Logger.Error("Error: Lead API failed:" + errorMessage);
                 return null;
             }
         }
@@ -363,32 +384,44 @@ namespace VINSolutionsAPI.Business
         {
             try
             { 
-            var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
-            var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
-            //LastUpdatedStartUTC=2016-12-18T12:00:00
+                var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
+                var endDateFormatted = endDate.Year + "-" + endDate.Month.ToString("00") + "-" + endDate.Day.ToString("00") + "T12:00:00";
+                //LastUpdatedStartUTC=2016-12-18T12:00:00
 
-            var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
-            HttpClient client = new HttpClient();
+                var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDateFormatted + "&LastUpdatedEndUTC=" + endDateFormatted;
+                HttpClient client = new HttpClient();
 
-            client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadSource/1.0");
+                client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadSource/1.0");
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadSourceModel>>().Result;
-                return returnModels;
-            }
+                // List data response.
+                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body. Blocking!
+                    //var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadSourceModel>>().Result;
+                    string jsonString = response.Content.ReadAsStringAsync().Result;
+                    var returnModels = JsonConvert.DeserializeObject<IEnumerable<LeadSourceModel>>(jsonString);
+
+                   // return returnModels;
+
+                    return returnModels;
+                }
+                else
+                {
+                   // errorMessage = errorMessage + "Inventory API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin LeadSource Api Call failed:" + response.StatusCode.ToString());
+                }
 
                 return null;
             }
             catch (Exception ex)
             {
+                Logger.Error("Error: LeadSource API failed:" + ex.Message);
                 return null;
             }
         }
@@ -410,22 +443,24 @@ namespace VINSolutionsAPI.Business
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadTradeInVehicleModel>>().Result;
-                return returnModels;
-            }
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body. Blocking!
+                    var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadTradeInVehicleModel>>().Result;
+                    return returnModels;
+                }
                 else
                 {
                     errorMessage = errorMessage + "LeadTradeInVehicles API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin LeadTradeInVehicles Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "LeadTradeInVehicles API - " + ex.Message + "/n";
-
+                Logger.Error("Error: LeadTradeInVehicles API failed:" + errorMessage);
                 return null;
             }
         }
@@ -449,22 +484,24 @@ namespace VINSolutionsAPI.Business
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadVehicleOfInterestModel>>().Result;
-                return returnModels;
-            }
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body. Blocking!
+                    var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadVehicleOfInterestModel>>().Result;
+                    return returnModels;
+                }
                 else
                 {
                     errorMessage = errorMessage + "LeadVehicleOfInterest API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin LeadTradeInVehicles Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "LeadVehicleOfInterest API - " + ex.Message + "/n";
-
+                Logger.Error("Error: LeadVehicleOfInterest API failed:" + errorMessage);
                 return null;
             }
         }
@@ -496,12 +533,15 @@ namespace VINSolutionsAPI.Business
                 else
                 {
                     errorMessage = errorMessage + "ServiceVisit API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin ServiceVisit Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
-                errorMessage = errorMessage + "ServiceVisit API - " + ex.Message + "/n";
+                errorMessage = errorMessage + "ServiceVisit API - " + ex.Message + "/n"; 
+                Logger.Error("Error: ServiceVisit API failed:" + errorMessage);
 
                 return null;
             }
@@ -534,12 +574,15 @@ namespace VINSolutionsAPI.Business
                 else
                 {
                     errorMessage = errorMessage + "ShowroomVisit API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin ShowroomVisit Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "ShowroomVisit API - " + ex.Message + "/n";
+                Logger.Error("Error: ShowroomVisit API failed:" + errorMessage);
 
                 return null;
             }
@@ -571,13 +614,17 @@ namespace VINSolutionsAPI.Business
             }
                 else
                 {
-                    errorMessage = errorMessage + "Tasks API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    errorMessage = errorMessage + "Task API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin Task Api Call failed:" + errorMessage);
                 }
                 return null;
             }
             catch (Exception ex)
             {
-                errorMessage = errorMessage + "Tasks API - " + ex.Message + "/n";
+                errorMessage = errorMessage + "Task API - " + ex.Message + "/n";
+               
+                Logger.Error("Error: Task API failed:" + errorMessage);
 
                 return null;
             }
@@ -631,5 +678,276 @@ namespace VINSolutionsAPI.Business
 
         }
 
+        public static void makePull(string entityName, DateTime sdate, DateTime edate)
+        {
+            var errorMessages = "";
+
+            switch (entityName.ToLower())
+            {
+                case "appointment":
+                    var appointments = Business.APIHelper.GetAppointments(sdate, edate, ref errorMessages);
+                    if (appointments != null && appointments.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateAppointment(appointments, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateAppointment failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "crmsold":
+                    var transactions = Business.APIHelper.GetCRMSoldTransactions(sdate, edate, ref errorMessages);
+                    if (transactions != null && transactions.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateCRMSoldTransaction(transactions, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateCRMSoldTransaction failed:" + errorMessages);
+                        }
+
+                    }
+                    break;
+                case "customer":
+                    var customers = Business.APIHelper.GetCustomers(sdate, edate, ref errorMessages);
+                    if (customers != null && customers.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateCustomer(customers, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateCustomer failed:" + errorMessages);
+                        }
+
+                    }
+                    break;
+                case "dealer":
+                    var dealers = Business.APIHelper.GetDealers();
+                    if (dealers != null && dealers.Count() > 0)
+                    {
+                        var success = Business.SQLQueries.InsertOrUpdateDealers(dealers);
+                    }
+                    break;
+
+                case "dmssold":
+
+                    var DMStransactions = Business.APIHelper.GetDMSSoldTransactions(sdate, edate, ref errorMessages);
+                    if (DMStransactions != null && DMStransactions.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateDMSSoldTransaction(DMStransactions, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateDMSSoldTransaction failed:" + errorMessages);
+                        }
+
+                    }
+                    break;
+                case "lead":
+                    var leads = Business.APIHelper.GetLeads(sdate, edate, ref errorMessages);
+                    if (leads != null && leads.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateLead(leads, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLead failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "inventory":
+                    var inventory = Business.APIHelper.GetInventory(sdate, edate, ref errorMessages);
+                    if (inventory != null && inventory.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateInventory(inventory, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateInventory failed:" + errorMessages);
+                        }
+                    }
+
+                    break;
+                case "leadtradeinv":
+                  
+                    var vehicles = Business.APIHelper.GetLeadTradeInVehicles(sdate, edate, ref errorMessages);
+                    if (vehicles != null && vehicles.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateLeadTradeInVehicle(vehicles, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLeadTradeInVehicle failed:" + errorMessages);
+                        }
+
+                    }
+                    break;
+                case "leadvofinterest":
+
+                    var vehinterests = Business.APIHelper.GetLeadVehicleOfInterest(sdate, edate, ref errorMessages);
+                    if (vehinterests != null && vehinterests.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateLeadVehicleOfInterest(vehinterests, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLeadVehicleOfInterest failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "task":
+                    var tasks = Business.APIHelper.GetTasks(sdate, edate, ref errorMessages);
+                    if (tasks != null && tasks.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateTask(tasks, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateTask failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "servicevisit":
+                    var visits = Business.APIHelper.GetServiceVisit(sdate, edate, ref errorMessages);
+                    if (visits != null && visits.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateServiceVisit(visits, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateServiceVisit failed:" + errorMessages);
+                        }
+                    }
+
+                    break;
+                case "sroomvisit":
+                    var srvisits = Business.APIHelper.GetShowroomVisit(sdate, edate, ref errorMessages);
+                    if (srvisits != null && srvisits.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateShowroomVisit(srvisits, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateShowroomVisit failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "user":
+                    var users1 = Business.APIHelper.GetUsers();
+                    if (users1 != null && users1.Count() > 0)
+                    {
+                        try
+                        {
+                            var success1 = Business.SQLQueries.InsertOrUpdateUsers(users1);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateUsers failed:" + errorMessages);
+                        }
+                    }
+                    break;
+                case "useraccess":
+                    var users2 = Business.APIHelper.GetUserAccess();
+                    if (users2 != null && users2.Count() > 0)
+                    {
+                        try
+                        {
+                            var success2 = Business.SQLQueries.InsertOrUpdateUserAccess(users2);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateUserAccess failed:" + errorMessages);
+                        }                        
+                    }
+                    break;
+                case "leadsource":
+                    var leadSource = Business.APIHelper.GetLeadSource(sdate, edate, "");
+                    if (leadSource != null && leadSource.Count() > 0)
+                    {
+                        try
+                        {
+                            var success = Business.SQLQueries.InsertOrUpdateLeadSource(leadSource, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLeadSource failed:" + errorMessages);
+                        }                     
+                    }                      
+                    break;
+                case "leadstatus":
+
+                    var leadStatus = Business.APIHelper.GetLeadStatus(sdate, edate, "");
+                    if (leadStatus != null && leadStatus.Count() > 0)
+                    {
+                        try
+                        {
+                            var success1 = Business.SQLQueries.InsertOrUpdateLeadStatus(leadStatus, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLeadStatus failed:" + errorMessages);
+                        }                    
+                    }
+
+                    break;
+                case "leadstatuscustom":
+                    var leadStatusCustom = Business.APIHelper.GetLeadStatusCustom(sdate, edate, "");
+
+                    if (leadStatusCustom != null && leadStatusCustom.Count() > 0)
+                    {
+                        try
+                        {
+                            var success2 = Business.SQLQueries.InsertOrUpdateLeadStatusCustom(leadStatusCustom, ref errorMessages);
+                        }
+                        catch (Exception ex)
+                        {
+                            var error = ex.Message;
+                            Logger.Error("Error: InsertOrUpdateLeadStatusCustom failed:" + errorMessages);
+                        }                     
+                    }
+                    break;
+                default:
+                    //no data loaded
+                    break;
+            }       
+       }
     }
 }

@@ -24,6 +24,6 @@ namespace VINSolutionsAPI.Models
         public bool FinanceMgrInd { get; set; }
         public string UserGroupName { get; set; }
         public string RecordStatusCode { get; set; }
-        public DateTime LastUpdatedUTCDate { get; set; }
+        public DateTime? LastUpdatedUTCDate { get; set; }
     }
 }

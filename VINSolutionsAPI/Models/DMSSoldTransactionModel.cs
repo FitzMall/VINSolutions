@@ -84,7 +84,7 @@ namespace VINSolutionsAPI.Models
         public string AHPrice { get; set; }
         public string AHCost { get; set; }
         public decimal FinanceReserve { get; set; }
-        public string NetFinanceReserve { get; set; }
+        public decimal? NetFinanceReserve { get; set; }
         public string BaseMonthlyPayment { get; set; }
         public string MonthlyTax { get; set; }
         public string WeOweFront { get; set; }
