@@ -23,8 +23,8 @@ namespace VINSolutionsAPI.Models
         public string CSIAgentUserID { get; set; }
         public string IsSalesCustomer { get; set; }
         public string IsServiceCustomer { get; set; }
-        public string LastInboundContactUTCDate { get; set; }
-        public string LastOutboundContactUTCDate { get; set; }
+        public string LastInboundContactUTCDate { get; set; } //no longer a field
+        public string LastOutboundContactUTCDate { get; set; } //no longer a field
         public string PostalCode { get; set; }
         public string DayTimePhone { get; set; }
         public string DayTimePhoneExt { get; set; }
@@ -40,7 +40,7 @@ namespace VINSolutionsAPI.Models
         public string CanBeCalled { get; set; }
         public string DoNotEmail { get; set; }
         public string CanBeEmailed { get; set; }
-        public string EBR { get; set; }
+        public string EBR { get; set; }   //no longer a field
         public string EBRSource { get; set; }
         public string EBRDate { get; set; }
         public string EBRExpiration { get; set; }

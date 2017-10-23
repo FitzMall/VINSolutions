@@ -28,6 +28,7 @@ namespace VINSolutionsAPI.Models
         public string AppointmentStatus { get; set; }
         public string LastUpdatedByUserID { get; set; }
         public string LastUpdatedUTCDate { get; set; }
+        public long LeadSourceID { get; set; }
 
     }
 }

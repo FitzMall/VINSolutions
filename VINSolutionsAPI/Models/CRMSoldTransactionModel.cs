@@ -47,5 +47,6 @@ namespace VINSolutionsAPI.Models
         public string CreatedUTCDate { get; set; }
         public string LastUpdatedByUserID { get; set; }
         public string LastUpdatedUTCDate { get; set; }
+        public long LeadSourceID { get; set; }
     }
 }
