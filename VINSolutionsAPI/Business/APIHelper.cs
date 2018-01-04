@@ -3,18 +3,18 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Linq;
-using System.Net;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Web;
 using VINSolutionsAPI.Models;
 using NLog;
-
+using VInSolutionsAPI.Mailers;
 
 namespace VINSolutionsAPI.Business
 {
     public class APIHelper
     {
+      
+        private static UserMailer uMailer = new UserMailer();
 
         public static string VINSolutionsBaseURL = ConfigurationManager.AppSettings["VINSolutionsBaseURL"].ToString();
         public static string VINSolutionsAPIKey = ConfigurationManager.AppSettings["VINSolutionsAPIKey"].ToString();
@@ -51,7 +51,8 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "Appointments API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin Api Call failed:" + errorMessage );
-                  
+                    uMailer.ApiErrorAlert(errorMessage).Send();
+
                 }             
 
                 return null;
@@ -60,6 +61,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "Appointments API - " + ex.Message + "/n";
                 Logger.Error("Error: Appointments API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -84,6 +86,11 @@ namespace VINSolutionsAPI.Business
 
                 // List data response.
                 HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                //string myMessage = "TEST";
+                //
+                // uMailer.ApiErrorAlert(myMessage).Send();
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
@@ -95,6 +102,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "CRMSoldTransactions API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
 
                 return null;
@@ -103,6 +111,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "CRMSoldTransactions API - " + ex.Message + "/n";
                 Logger.Error("Error: CRMSoldTransactions API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -146,6 +155,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "Customer API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
 
@@ -153,6 +163,7 @@ namespace VINSolutionsAPI.Business
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "Customer API - " + ex.InnerException + "/n";
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
 
@@ -260,6 +271,7 @@ namespace VINSolutionsAPI.Business
                         errorMessage = errorMessage + "Inventory API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                         Logger.Error("Error***" + DateTime.Now);
                         Logger.Error("Error: Vin Api Call failed:" + errorMessage);
+                        uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                     return null;
             }
@@ -267,6 +279,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "Inventory API - " + ex.Message + "/n";
                 Logger.Error("Error: Inventory API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -301,6 +314,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "Leads API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin Lead Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -308,6 +322,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "Leads API - " + ex.Message + "/n";
                 Logger.Error("Error: Lead API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -332,12 +347,19 @@ namespace VINSolutionsAPI.Business
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadStatusModel>>().Result;
-                return returnModels;
-            }
+                if (response.IsSuccessStatusCode)
+                {
+                    // Parse the response body. Blocking!
+                    var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadStatusModel>>().Result;
+                    return returnModels;
+                }
+                else
+                {
+                   
+                    Logger.Error("Error***" + DateTime.Now);
+                    Logger.Error("Error: Vin LeadStatus Api Call failed:");
+                    uMailer.ApiErrorAlert("Error: Vin LeadStatus Api Call failed:").Send();
+                }
 
                 return null;
             }
@@ -454,6 +476,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "LeadTradeInVehicles API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin LeadTradeInVehicles Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -461,6 +484,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "LeadTradeInVehicles API - " + ex.Message + "/n";
                 Logger.Error("Error: LeadTradeInVehicles API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -495,6 +519,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "LeadVehicleOfInterest API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin LeadTradeInVehicles Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -502,6 +527,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "LeadVehicleOfInterest API - " + ex.Message + "/n";
                 Logger.Error("Error: LeadVehicleOfInterest API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
         }
@@ -535,6 +561,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "ServiceVisit API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin ServiceVisit Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -542,6 +569,8 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "ServiceVisit API - " + ex.Message + "/n"; 
                 Logger.Error("Error: ServiceVisit API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
+
 
                 return null;
             }
@@ -576,6 +605,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "ShowroomVisit API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin ShowroomVisit Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -583,6 +613,7 @@ namespace VINSolutionsAPI.Business
             {
                 errorMessage = errorMessage + "ShowroomVisit API - " + ex.Message + "/n";
                 Logger.Error("Error: ShowroomVisit API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
 
                 return null;
             }
@@ -617,6 +648,7 @@ namespace VINSolutionsAPI.Business
                     errorMessage = errorMessage + "Task API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
                     Logger.Error("Error***" + DateTime.Now);
                     Logger.Error("Error: Vin Task Api Call failed:" + errorMessage);
+                    uMailer.ApiErrorAlert(errorMessage).Send();
                 }
                 return null;
             }
@@ -625,6 +657,7 @@ namespace VINSolutionsAPI.Business
                 errorMessage = errorMessage + "Task API - " + ex.Message + "/n";
                
                 Logger.Error("Error: Task API failed:" + errorMessage);
+                uMailer.ApiErrorAlert(errorMessage).Send();
 
                 return null;
             }
@@ -914,7 +947,7 @@ namespace VINSolutionsAPI.Business
                 case "leadstatus":
 
                     var leadStatus = Business.APIHelper.GetLeadStatus(sdate, edate, "");
-                    if (leadStatus != null && leadStatus.Count() > 0)
+                     if (leadStatus != null && leadStatus.Count() > 0)
                     {
                         try
                         {

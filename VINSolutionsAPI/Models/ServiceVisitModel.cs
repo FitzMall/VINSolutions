@@ -8,7 +8,7 @@ namespace VINSolutionsAPI.Models
     public class ServiceVisitModel
     {
         public long DealerID { get; set; }
-        public long CustomerID { get; set; }
+        public long? CustomerID { get; set; }
         public long RepairOrderID { get; set; }
         public long RepairOrderNumber { get; set; }
         public string VIN { get; set; }

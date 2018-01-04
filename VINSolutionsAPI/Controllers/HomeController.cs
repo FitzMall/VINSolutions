@@ -119,6 +119,7 @@ namespace VINSolutionsAPI.Controllers
             Int32 numberofDays;
             DateTime mySdate;
             DateTime myEdate;
+
             //regular load one day data
             if (string.IsNullOrEmpty(sdate) && string.IsNullOrEmpty(edate))
             {
@@ -151,20 +152,15 @@ namespace VINSolutionsAPI.Controllers
             }
             else
             {
+                if (entityname.ToLower() == "customer"){
+                    Logger.Info("========="+ DateTime.Now + "=========");
+                }           
                 Logger.Info("Load data started: " + DateTime.Now + " ***entityname***=" + entityname);
+
                 if (numberofDays < 14 )
                 {
                     ////just pass the startdate and end date to vin api
-                    Business.APIHelper.makePull(entityname, mySdate, myEdate);
-                    //Business.APIHelper.makePull("appointment", mySdate, myEdate);
-                    //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
-                    //Business.APIHelper.makePull("customer", mySdate, myEdate);
-                    //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
-                    //Business.APIHelper.makePull("inventory", mySdate, myEdate);
-                    //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
-                    //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
-                    //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
-                    //Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
+                    Business.APIHelper.makePull(entityname, mySdate, myEdate);                 
 
                 }
                 else
@@ -177,15 +173,7 @@ namespace VINSolutionsAPI.Controllers
                         //api call by calculate date
                         mySdate = myEdate.AddDays(-10);
                         Business.APIHelper.makePull(entityname, mySdate, myEdate);
-                        //Business.APIHelper.makePull("appointment", mySdate, myEdate);
-                        //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
-                        //Business.APIHelper.makePull("customer", mySdate, myEdate);
-                        //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
-                        //Business.APIHelper.makePull("inventory", mySdate, myEdate);
-                        //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
-                        //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
-                        //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
-                        // Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
+                       
                         myEdate = mySdate;
                     }
 
@@ -193,20 +181,12 @@ namespace VINSolutionsAPI.Controllers
                     {
                         mySdate = myEdate.AddDays(-mod);
                         Business.APIHelper.makePull(entityname, mySdate, myEdate);
-                        //Business.APIHelper.makePull("appointment", mySdate, myEdate);
-                        //Business.APIHelper.makePull("crmsold", mySdate, myEdate);
-                        //Business.APIHelper.makePull("customer", mySdate, myEdate);
-                        //Business.APIHelper.makePull("dmssold", mySdate, myEdate);
-                        //Business.APIHelper.makePull("inventory", mySdate, myEdate);
-                        //Business.APIHelper.makePull("leadtradeinv", mySdate, myEdate);
-                        //Business.APIHelper.makePull("leadvofinterest", mySdate, myEdate);
-                        //Business.APIHelper.makePull("servicevisit", mySdate, myEdate);
-                        //Business.APIHelper.makePull("sroomvisit", mySdate, myEdate);
+                      
                     }
                 }
+                Logger.Info("Load data end=>> end: " + DateTime.Now + " ***entityname***=" + entityname);
             }
-      
-            Logger.Info("Load data end=>> end: " + DateTime.Now);
+                
             return Json("Success", JsonRequestBehavior.AllowGet);
         }
 
