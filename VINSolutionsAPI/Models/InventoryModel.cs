@@ -22,9 +22,9 @@ namespace VINSolutionsAPI.Models
         public string ComparePrice { get; set; }
         public string Cost { get; set; }
         public long PhotoCount { get; set; }
-        public bool HasVideo { get; set; }
-        public bool HasCarfax { get; set; }
-        public bool HasComments { get; set; }
+        public bool? HasVideo { get; set; }
+        public bool? HasCarfax { get; set; }
+        public bool? HasComments { get; set; }
         public string VehicleType { get; set; }
         public string RecordStatusCode { get; set; }
         public DateTime InventoryUTCDate { get; set; }

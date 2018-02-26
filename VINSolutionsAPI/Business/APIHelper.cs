@@ -118,7 +118,7 @@ namespace VINSolutionsAPI.Business
 
         public static IEnumerable<CustomerModel> GetCustomers(DateTime startDate, DateTime endDate, ref string errorMessage)
         {
-
+            var requesturl = "";
             try
             { 
                 var startDateFormatted = startDate.Year + "-" + startDate.Month.ToString("00") + "-" + startDate.Day.ToString("00") + "T12:00:00";
@@ -130,10 +130,12 @@ namespace VINSolutionsAPI.Business
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Customer/1.0");
 
+
+                requesturl = requesturl + VINSolutionsBaseURL + "/Customer/1.0" + urlParameters;
                     //client.DefaultRequestHeaders.AcceptCharset.Add()
                     // Add an Accept header for JSON format.     
                 client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
-                client.DefaultRequestHeaders.Accept.Add(
+                client.DefaultRequestHeaders.Accept.Add( 
                    new MediaTypeWithQualityHeaderValue("application/json"));               
 
                 // List data response.
@@ -152,17 +154,21 @@ namespace VINSolutionsAPI.Business
                 }
                 else
                 {
-                    errorMessage = errorMessage + "Customer API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
+                    errorMessage = errorMessage + "Customer API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() +  @"<br/>" + requesturl + "/r/n";
                     Logger.Error("Error***" + DateTime.Now);
+
                     Logger.Error("Error: Vin Api Call failed:" + errorMessage);
                     uMailer.ApiErrorAlert(errorMessage).Send();
                 }
+
                 return null;
 
             }
             catch (Exception ex)
             {
-                errorMessage = errorMessage + "Customer API - " + ex.InnerException + "/n";
+                Logger.Error("Error***" + DateTime.Now);
+                Logger.Error("Error: Customer API - Call failed:" + ex.InnerException);               
+                errorMessage = errorMessage + "Customer API - " + ex.InnerException + "/r/n" + requesturl;
                 uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
@@ -365,6 +371,9 @@ namespace VINSolutionsAPI.Business
             }
             catch (Exception ex)
             {
+                Logger.Error("Error***" + DateTime.Now);
+                Logger.Error("Error: Vin LeadStatus Api Call failed:");
+                uMailer.ApiErrorAlert("Error: Vin LeadStatus Api Call failed:").Send();
                 return null;
             }
         }
@@ -398,6 +407,9 @@ namespace VINSolutionsAPI.Business
             }
             catch (Exception ex)
             {
+                Logger.Error("Error***" + DateTime.Now);
+                Logger.Error("Error: Vin LeadStatusCustom Api Call failed:");
+                uMailer.ApiErrorAlert("Error: Vin LeadStatusCustom Api Call failed:").Send();
                 return null;
             }
         }
@@ -444,6 +456,7 @@ namespace VINSolutionsAPI.Business
             catch (Exception ex)
             {
                 Logger.Error("Error: LeadSource API failed:" + ex.Message);
+                uMailer.ApiErrorAlert("Error: Vin LeadSource Api Call failed:").Send();
                 return null;
             }
         }
@@ -682,6 +695,11 @@ namespace VINSolutionsAPI.Business
                 var returnModels = response.Content.ReadAsAsync<IEnumerable<UserModel>>().Result;
                 return returnModels;
             }
+            else
+            {
+                Logger.Error("Error***" + DateTime.Now);
+                Logger.Error("Error: Vin Users Api Call failed:");
+            }
 
             return null;
 
@@ -698,13 +716,18 @@ namespace VINSolutionsAPI.Business
             client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
+            //List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
             if (response.IsSuccessStatusCode)
             {
                 // Parse the response body. Blocking!
                 var returnModels = response.Content.ReadAsAsync<IEnumerable<UserAccessModel>>().Result;
                 return returnModels;
+            }
+            else
+            {
+                Logger.Error("Error***" + DateTime.Now);
+                Logger.Error("Error: Vin UserAccess Api Call failed:");
             }
 
             return null;

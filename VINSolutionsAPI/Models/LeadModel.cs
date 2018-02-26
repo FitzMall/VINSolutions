@@ -16,7 +16,7 @@ namespace VINSolutionsAPI.Models
         public string LeadStatusID { get; set; }
         public string LeadStatusCustomID { get; set; }
         public long LeadStatusTypeID { get; set; }
-        public bool ADFXML { get; set; }
+        public bool? ADFXML { get; set; }
         public string FirstAttemptedContactUTCDate { get; set; }
         public string LastAttemptedContactUTCDate { get; set; }
         public string LastAttemptedEmailContactUTCDate { get; set; }
@@ -24,9 +24,9 @@ namespace VINSolutionsAPI.Models
         public string LastCustomerContactUTCDate { get; set; }
         public string LastAttemptedOrActualContactUTCDate { get; set; }
         public string DealerActionableUTCDate { get; set; }
-        public bool HasBeenContacted { get; set; }
-        public bool HasVehicleOfInterest { get; set; }
-        public bool OriginatedAfterHours { get; set; }
+        public bool? HasBeenContacted { get; set; }
+        public bool? HasVehicleOfInterest { get; set; }
+        public bool? OriginatedAfterHours { get; set; }
         public string AdjustedResponseTimeInMinutes { get; set; }
         public string ActualResponseTimeInMinutes { get; set; }
         public DateTime OriginationUTCDate { get; set; }

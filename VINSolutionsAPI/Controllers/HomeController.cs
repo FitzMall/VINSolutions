@@ -120,6 +120,7 @@ namespace VINSolutionsAPI.Controllers
             DateTime mySdate;
             DateTime myEdate;
 
+
             //regular load one day data
             if (string.IsNullOrEmpty(sdate) && string.IsNullOrEmpty(edate))
             {
@@ -156,6 +157,17 @@ namespace VINSolutionsAPI.Controllers
                     Logger.Info("========="+ DateTime.Now + "=========");
                 }           
                 Logger.Info("Load data started: " + DateTime.Now + " ***entityname***=" + entityname);
+
+
+                //leadstatus, leadstatuscustom,leadsource, no 14 days limit leadstatuscustom
+
+                if (entityname.ToLower() == "leadstatus" || entityname.ToLower() == "leadstatuscustom" || entityname.ToLower() == "leadsource")
+                {
+                    Business.APIHelper.makePull(entityname, mySdate, myEdate);
+                    Logger.Info("Load data end=>> end: " + DateTime.Now + " ***entityname***=" + entityname);
+                    return Json("Success", JsonRequestBehavior.AllowGet);
+                }
+
 
                 if (numberofDays < 14 )
                 {
