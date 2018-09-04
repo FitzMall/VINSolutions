@@ -12,3 +12,54 @@ Error Message As Below
 <br />
 @ViewBag.Data
 <br />
+
+Rerun VinSolution API Job Instrunctions:
+<br/>
+
+First checking JJF F drive log vinapi log file for Errors.  Path "F:\vinapi_log\log.txt"
+<br /> If Customer Api call failed, all other table job need be rerun. CustomerId is the master key!  
+<br /> If Customer and Lead table has no errors, then job 1, 2 can be skipped.
+
+
+<br /> 1. Remote login to ...196 JJFDataServer with fitzdata account 
+<br /> 2. Open Microsoft SQL Server Management Studio and login with Localhost/fitzdata
+<br /> 3. Expand SQL Server Agent, then click Jobs to find VINSolutions_API_DailyLoad_*** jobs
+<br /> 4. Right click each job, select [Start Job At step...] from menu, then click start to run.
+
+
+
+<p> All jobs must be run at follow order!</p>
+<p>
+  1.  VINSolutions_API_DailyLoad_1Customer632AM (can be skipped)
+</p>
+
+<p>
+  2.  VINSolutions_API_DailyLoad_2Lead637AM (can be skipped)
+</p>
+
+<p>
+  3.  VINSolutions_API_DailyLoad_2LeadofInterested640AM
+</p>
+
+<p>
+  4.  VINSolutions_API_dailyLoad_3_5tbls645AM
+</p>
+
+<p>
+  5.  VINSolutions_API_dailyLoad_4_3tbls655AM
+</p>
+
+<p>
+  6.  VINSolutions_API_LeadFlatData_DailyRefresh710AM
+</p>
+
+<p>
+ 7. VINSolutions_MTD_data720AM --> this job to generate MTD data
+</p>
+<p>
+ 8. VINSolutions_MTDRpt_DailyEmail_ForAll745AM--> send email out (New/Used/Unknown three sections)
+</p>
+
+<p>
+ 9. VINSolutions_MTDRpt_DailyEmail_ForMGR755AM--> send email out for Manager
+</p>

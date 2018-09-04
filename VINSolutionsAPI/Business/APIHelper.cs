@@ -34,6 +34,10 @@ namespace VINSolutionsAPI.Business
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Appointment/1.0");
 
+
+                //add?
+                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -80,6 +84,9 @@ namespace VINSolutionsAPI.Business
                 HttpClient client = new HttpClient();
                 client.BaseAddress = new Uri(VINSolutionsBaseURL + "/CRMSoldTransaction/1.0");
 
+
+                //add?
+                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -284,7 +291,7 @@ namespace VINSolutionsAPI.Business
             catch (Exception ex)
             {
                 errorMessage = errorMessage + "Inventory API - " + ex.Message + "/n";
-                Logger.Error("Error: Inventory API failed:" + errorMessage);
+                Logger.Error("Error: Inventory API failed:" + errorMessage); 
                 uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
             }
@@ -303,18 +310,27 @@ namespace VINSolutionsAPI.Business
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/Lead/1.0");
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
+
+                //add?
+                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
             if (response.IsSuccessStatusCode)
             {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadModel>>().Result;
-                return returnModels;
-            }
+                    // Parse the response body. Blocking!
+                    // var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadModel>>().Result;
+                    // return returnModels;
+
+                    // Parse the response body. Blocking!
+                    string jsonString = response.Content.ReadAsStringAsync().Result;
+                    var returnModels = JsonConvert.DeserializeObject<IEnumerable<LeadModel>>(jsonString);
+                    return returnModels;
+
+                }
                 else
                 {
                     errorMessage = errorMessage + "Leads API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";
@@ -427,6 +443,9 @@ namespace VINSolutionsAPI.Business
 
                 client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadSource/1.0");
 
+                //add?
+                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+
                 // Add an Accept header for JSON format.
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
@@ -472,8 +491,11 @@ namespace VINSolutionsAPI.Business
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadTradeInVehicle/1.0");
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
+             //add?
+             //client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
             // List data response.
@@ -481,8 +503,13 @@ namespace VINSolutionsAPI.Business
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
-                    var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadTradeInVehicleModel>>().Result;
+                    //var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadTradeInVehicleModel>>().Result;
+                    //return returnModels;
+                    string jsonString = response.Content.ReadAsStringAsync().Result;
+                    var returnModels = JsonConvert.DeserializeObject<IEnumerable<LeadTradeInVehicleModel>>(jsonString);
                     return returnModels;
+
+
                 }
                 else
                 {
@@ -495,7 +522,7 @@ namespace VINSolutionsAPI.Business
             }
             catch (Exception ex)
             {
-                errorMessage = errorMessage + "LeadTradeInVehicles API - " + ex.Message + "/n";
+                errorMessage = errorMessage + "LeadTradeInVehicles API - " + ex.Message;
                 Logger.Error("Error: LeadTradeInVehicles API failed:" + errorMessage);
                 uMailer.ApiErrorAlert(errorMessage).Send();
                 return null;
@@ -514,18 +541,28 @@ namespace VINSolutionsAPI.Business
             //var urlParameters = "?api_key=" + VINSolutionsAPIKey + "&LastUpdatedStartUTC=" + startDate.ToUniversalTime() + "&LastUpdatedEndUTC=" + endDate.ToUniversalTime();
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadVehicleOfInterest/1.0");
+             
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
+                //add?
+                client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+                //utf-8 utf-16 
+
+                // Add an Accept header for JSON format.
+                client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
-                    var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadVehicleOfInterestModel>>().Result;
+                   // var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadVehicleOfInterestModel>>().Result;
+                   // return returnModels;
+                    string jsonString = response.Content.ReadAsStringAsync().Result;
+                    var returnModels = JsonConvert.DeserializeObject<IEnumerable<LeadVehicleOfInterestModel>>(jsonString);
                     return returnModels;
+
                 }
                 else
                 {
@@ -601,8 +638,11 @@ namespace VINSolutionsAPI.Business
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/ShowroomVisit/1.0");
 
-            // Add an Accept header for JSON format.
-            client.DefaultRequestHeaders.Accept.Add(
+            //add?
+           client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+
+                // Add an Accept header for JSON format.
+           client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
             // List data response.

@@ -40,11 +40,12 @@ namespace VInSolutionsAPI.Mailers
                 x.ViewName = "ErrorAlert";
                 x.IsBodyHtml = true;
                 x.Body = errorMessage;
+               // x.To.Add(mailTo);
 
-                foreach (var em in myList)
-                {
-                    x.To.Add(em);
-                }
+                  foreach (var em in myList)
+                  {
+                   x.To.Add(em);
+                 }
             });
         }
 
