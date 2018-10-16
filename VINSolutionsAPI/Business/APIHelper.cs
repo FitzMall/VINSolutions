@@ -43,7 +43,7 @@ namespace VINSolutionsAPI.Business
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // List data response.
-                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!        
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
@@ -93,10 +93,6 @@ namespace VINSolutionsAPI.Business
 
                 // List data response.
                 HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-
-                //string myMessage = "TEST";
-                //
-                // uMailer.ApiErrorAlert(myMessage).Send();
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -317,10 +313,17 @@ namespace VINSolutionsAPI.Business
                 client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
+                // List data response.
+                // HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
+                if (response.IsSuccessStatusCode)
+                {
                     // Parse the response body. Blocking!
                     // var returnModels = response.Content.ReadAsAsync<IEnumerable<LeadModel>>().Result;
                     // return returnModels;
@@ -491,15 +494,13 @@ namespace VINSolutionsAPI.Business
             HttpClient client = new HttpClient();
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/LeadTradeInVehicle/1.0");
 
-             //add?
-             //client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+            //add?
+            client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
+            // Add an Accept header for JSON format.
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
-                // Add an Accept header for JSON format.
-                client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
-
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                // List data response.
+                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
@@ -551,8 +552,15 @@ namespace VINSolutionsAPI.Business
                 client.DefaultRequestHeaders.Accept.Add(
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                // List data response.
+                //HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -645,14 +653,25 @@ namespace VINSolutionsAPI.Business
            client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
-            // List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
-            if (response.IsSuccessStatusCode)
-            {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<ShowroomVisitModel>>().Result;
-                return returnModels;
-            }
+                // List data response.
+                //HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                               
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
+                if (response.IsSuccessStatusCode)
+                {
+                   // Parse the response body. Blocking!
+                   // string jsonString = response.Content.ReadAsStringAsync().Result;
+                   // var returnModels = JsonConvert.DeserializeObject<IEnumerable<ShowroomVisitModel>>(jsonString);
+                   // return returnModels;
+
+                    var returnModels = response.Content.ReadAsAsync<IEnumerable<ShowroomVisitModel>>().Result;
+                    return returnModels;
+                }
                 else
                 {
                     errorMessage = errorMessage + "ShowroomVisit API - " + startDateFormatted + ":" + endDateFormatted + ":" + response.StatusCode.ToString() + "/n";

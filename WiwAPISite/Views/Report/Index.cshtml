@@ -1,0 +1,208 @@
+﻿@model WiwAPISite.Models.EmpTimesViewModel
+@using WiwAPISite.Helper;
+@{
+
+    //Layout = "~/Views/Shared/_AppraisalReportLayout.cshtml";
+    ViewBag.Title = "Index";
+    var now = DateTime.Now;
+    var startOfMonth = new DateTime(now.Year, now.Month, 1);
+
+    var startdt = now.AddDays(-14);
+    var enddt = now; // now.AddDays(-14);
+
+    var myStartDate = String.Format("{0:yyyy-MM-dd}", Model.StartDate);
+
+    var myEndDate = String.Format("{0:yyyy-MM-dd}", Model.EndDate);
+ 
+    
+}
+
+   
+
+
+<h3>Fitzgerald Automall Associate Time Report</h3>
+<form action="@Url.Action("Index", "Report")" method="post">
+    <div class="row">
+        <div class="col-lg-12">
+
+            <table class="table table-striped table-bordered" style="height: 80px; border-top: solid; border-bottom: solid; border-left: solid; border-right: solid; border-color: lightgray;">
+                <tr>
+                    <td>
+                        <label>
+                            Start Date:
+                        </label>
+                        <input id="StartDate" name="StartDate" value="@(Model.StartDate.ToShortDateString() == "1/1/0001" ? @startdt.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
+                        @Html.ValidationMessageFor(model => model.StartDate)
+                    </td>
+                    <td>
+                        <label>
+                            End Date:
+                        </label>
+                        <input id="EndDate" name="EndDate" value="@(Model.EndDate.ToShortDateString() == "1/1/0001" ? @enddt.ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
+                        @Html.ValidationMessageFor(model => model.EndDate)
+                    </td>
+
+                </tr>
+
+                <tr>
+                    <td >
+                        <label>Store Location: </label> @Html.DropDownListFor(m => m.storeLoc, new SelectList(Model.storeLocs, "Loc", "LocName", @ViewBag.storeLoc))
+                    </td>
+                    <td >
+                        <label>Department: </label>
+                     
+
+                         @Html.DropDownListFor(m => m.locDept, new SelectList(Model.locDepts, "deptName", "deptName", @ViewBag.locDept))
+
+
+                        @*@if (Model.locDepts != null && Model.locDepts.Count() != 0)
+                        {
+                            @Html.DropDownListFor(m => m.locDept, new SelectList(Model.locDepts, "deptName", "deptName", SessionVar.GetString("locDept")))
+                        }
+                        else
+                        {
+                            <select id="locDept" name="locDept"></select>
+                        }*@
+
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center" colspan="2">
+                        <input id="UserId" name="UserId" type="hidden" value="@ViewBag.userId" />
+                        @ViewBag.CookieUserName
+                        <button type="submit" id="btnSubmit" class="btn btn-primary">
+                            Submit
+                        </button>
+
+                    </td>
+                </tr>
+            </table>
+
+        </div>
+    </div>
+    <span><strong>@ViewBag.ResultTitle</strong></span>
+    <br/>
+    <br />
+    <div class="row">
+    <div class="col-lg-12">
+       <div class="panel panel-default panel-info">
+             
+            @if (Model.EmpHourlist != null && Model.EmpHourlist.Count>0)
+            {
+
+                    <table id="tblData_SUM" class="table table-striped table-bordered order-column">
+                        <thead>
+                            <tr class="info" style="background-color:lightsteelblue;">
+                                <th>Loc</th>
+                                <th>Department</th>
+                                <th>AssociateName</th>
+                                <th>ReynoldHours</th>
+                                <th>WIWHours</th>
+                                <th>HourVariance</th>
+                            </tr>
+                        </thead>
+                        @foreach (var rs in Model.EmpHourlist)
+                        {
+                            var empname = rs.EMPName.ToString();
+                            var classname = "emp-" + @rs.Loc + "-" + @rs.EMPCode;
+                            <tr>
+                                <td> @Html.DisplayFor(modelItem => rs.Loc)</td>
+                                <td> @Html.DisplayFor(modelItem => rs.Dept)</td>
+                                <td>
+                                                               
+                                  <a href="@Url.Action("HourDetails", "Report", new { loc = @rs.Loc, empCode = @rs.EMPCode, start = @myStartDate, end = @myEndDate })" >@Html.DisplayFor(modelItem => rs.EMPName)</a>
+                                </td>
+                                <td> @Html.DisplayFor(modelItem => rs.ReytotalHours)</td>
+                                <td> @Html.DisplayFor(modelItem => rs.WIWTotalHours)</td>
+                                <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
+                            </tr>
+                        }
+
+                    </table>
+                }
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<script type="text/javascript" charset="utf-8">
+
+    $(document).ready(function () {
+
+        $('#tblData_SUM').DataTable({
+            "lengthMenu": [[ 25, 50, 100], [25, 50, 100]]
+
+        });
+
+        $(function () {
+
+            $("#StartDate").datepicker();
+            $("#EndDate").datepicker();
+
+        });
+
+        $('#btnSubmit').click(function () {
+            var msg;
+            var isGood = true;
+
+            if ($('#StartDate').val() === "") {
+                //alert('Please select start date.');
+                msg = "Please select start date.";
+                isGood = false;
+            }
+
+            if ($('#EndDate').val() === "") {
+                // alert('Please select end date.');
+                msg = msg + 'Please select end date.';
+                isGood = false;
+            }
+
+            if (!isGood) {
+                alert(msg);
+                return false;
+            }
+        });
+
+        //loc change
+        $("#storeLoc").on("change", function () {
+           // alert("??");
+            loadLocDepts($(this).val());
+        })
+        ////mgr change
+        //$("#ddlMgr").on("change", function () {
+        //    // alert("here");
+        //    loadStoreMgrAso($(this).val());
+        //})
+
+        function loadLocDepts(loc) {
+            //console.log(loc);
+            //alert(val);
+            $.getJSON('@Url.Action("getDeptsForLoc", "Report")' + "?storeLoc=" + loc, function (result) {
+                 $("#locDept").html("");   // makes select null before filling process
+                 var data = result.data;
+                 for (var i = 0; i < data.length; i++) {
+                     // result[0].["deptName"]
+                     $("#locDept").append("<option>" + data[i] + "</option>")
+                 }
+
+            })
+        }
+    });
+
+
+    function handle(e) {
+        if (e.keyCode === 13) {
+            e.preventDefault(); // Ensure it is only this code that rusn
+            // alert(this.id);
+            // alert("Enter was pressed was presses");
+            //  alert(id.id);
+        }
+        //var myid = this.id;
+        //$("#TxtBox_" + myid).keyup(function () {
+        //    alert(this.value);
+        //});
+    }
+
+
+</script>
