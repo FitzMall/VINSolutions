@@ -21,7 +21,7 @@ namespace VINSolutionsAPI.Models
         public string ResultDescription { get; set; }
         public bool BeBack { get; set; }
         public string LeadMessageType { get; set; }
-        public bool ContactedAfterVisit { get; set; }
+        public bool? ContactedAfterVisit { get; set; }
         public bool WalkAround { get; set; }
         public bool TradeAppraisal { get; set; }
         public bool DemoTestDrive { get; set; }
@@ -37,7 +37,7 @@ namespace VINSolutionsAPI.Models
         public bool Custom5 { get; set; }
         public bool Custom6 { get; set; }
         public bool Custom7 { get; set; }
-        public bool DeletedFlag { get; set; }
+        public bool? DeletedFlag { get; set; }
         public DateTime LastUpdatedUTCDate { get; set; }
     }
 }
