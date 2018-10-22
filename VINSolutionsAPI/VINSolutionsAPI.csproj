@@ -205,6 +205,7 @@
     <Compile Include="Models\DMSSoldTransactionModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\InventoryModel.cs" />
+    <Compile Include="Models\JsonAppot.cs" />
     <Compile Include="Models\LeadModel.cs" />
     <Compile Include="Models\LeadSourceModel.cs" />
     <Compile Include="Models\LeadStatusCustomModel.cs" />

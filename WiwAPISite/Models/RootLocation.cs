@@ -39,8 +39,8 @@ namespace WiwAPISite.Models
     public class FitzLocation
     {
         public int id { get; set; }
-      //  public int account_id { get; set; }
-      //  public int is_default { get; set; }
+        public int account_id { get; set; }
+        public string is_default { get; set; }
         public string name { get; set; }
         public string address { get; set; }
         public string created_at { get; set; }

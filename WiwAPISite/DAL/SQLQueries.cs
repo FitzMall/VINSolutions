@@ -22,6 +22,8 @@ namespace WiwAPISite.DAL
                 {
                     FitzLocation ftbl = new FitzLocation();
                     ftbl.id = location.id;
+                    ftbl.account_id = location.account_id;
+                    ftbl.is_default = location.is_default.ToString();
                     ftbl.name = location.name;
                     ftbl.address = location.address;
                     ftbl.created_at = location.created_at.ToString();
