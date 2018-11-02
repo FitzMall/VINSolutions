@@ -34,9 +34,9 @@ namespace WiwAPISite.Models
         public string uuid { get; set; }
         public string notes { get; set; }
         public bool is_private { get; set; }
-        public int hours_preferred { get; set; }
-        public int hours_max { get; set; }
-        public int hourly_rate { get; set; }
+        public float? hours_preferred { get; set; }
+        public float? hours_max { get; set; }
+        public float? hourly_rate { get; set; }
         public Alert_Settings alert_settings { get; set; }
         public int reminder_time { get; set; }
         public string sleep_start { get; set; }
@@ -90,9 +90,9 @@ namespace WiwAPISite.Models
         public string uuid { get; set; }
         public string notes { get; set; }
        
-        public float hours_preferred { get; set; }
-        public float hours_max { get; set; }
-        public float hourly_rate { get; set; }
+        public float? hours_preferred { get; set; }
+        public float? hours_max { get; set; }
+        public float? hourly_rate { get; set; }
 
         public int reminder_time { get; set; }
         public string last_login { get; set; }

@@ -245,3 +245,6 @@ ModelManifest.xml
 .fake/
 /VINSolutionsAPI/Models/JsonAppot.cs
 /VINSolutionsAPI/Models/JsonShowroom.cs
+/WiwAPISite/Scripts/chosen.jquery.min.js
+/WiwAPISite/Scripts/jquery.cookie.js
+/WiwAPISite/Scripts/jstorage.js

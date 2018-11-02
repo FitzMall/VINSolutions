@@ -454,7 +454,18 @@ namespace VINSolutionsAPI.Business
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // List data response.
-                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+               // HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+
+
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
@@ -500,7 +511,16 @@ namespace VINSolutionsAPI.Business
             client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // List data response.
-                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                // HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!

@@ -17,12 +17,17 @@ namespace WiwAPISite.Models
         public List<storeLoc> storeLocs { get; set; } 
 
 
-        public string locDept { get; set; }
+        public string selectedDept { get; set; }
         public List<locDept> locDepts { get; set; }
+
+
+
+       // public string[] SelectedBrands { get; set; }
+
 
         [Required(ErrorMessage = "StartDate is required")]
         public DateTime StartDate { get; set; }
-
+         
         [Required(ErrorMessage = "EndDate is required")]
         public DateTime EndDate { get; set; }
         public  List<EmpTime>  EmpHourlist{ get; set; }
@@ -47,10 +52,20 @@ namespace WiwAPISite.Models
         public decimal WIWTotalHours { get; set; }
         public decimal HourVariance { get; set; }
 
+        public string PUNCH_IN { get; set; }
+        public string MEAL_OUT { get; set; }
+        public string MEAL_IN { get; set; }
+        public string PUNCH_OUT { get; set; }
+
+        public string Sch_Start { get; set; }
+        public string Sch_End { get; set; }
+
+
+
         private static Logger logger = LogManager.GetCurrentClassLogger();
         private static string mycon196 = ConfigurationManager.ConnectionStrings["DB196"].ConnectionString;
 
-        public List<EmpTime> getEmpSumHours(DateTime start, DateTime end, string loc, string dept)
+        public List<EmpTime> getEmpSumHours(DateTime start, DateTime end, string loc, string depts)
         {
 
             //
@@ -65,7 +80,7 @@ namespace WiwAPISite.Models
                   p.Add("startDate", start);
                   p.Add("endDate", end);
                   p.Add("loc", loc);
-                  p.Add("dept", dept);
+                  p.Add("depts", depts);
 
 
                 List<EmpTime> rs = SqlMapperUtil.StoredProcWithParams<EmpTime>(st, p, mycon196);
@@ -143,6 +158,7 @@ namespace WiwAPISite.Models
     public class locDept
     {
         public int RowID { get; set; }
+        public int deptId { get; set; }
         public string deptName { get; set; }
 
         private static Logger logger = LogManager.GetCurrentClassLogger();

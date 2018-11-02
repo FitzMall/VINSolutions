@@ -38,15 +38,15 @@ namespace WiwAPISite.Controllers
 
 
             //dropdowns
-            string locD = Request.Form["locDept"];
+            string locD = Request.Form["selectedDept"];
             if (String.IsNullOrEmpty(locD) || locD == "ALL")
             {
                 locD = "ALL";
-                ViewBag.locDept = "ALL";
+                ViewBag.selectedDept = "ALL";
             }
             else
             {
-                ViewBag.locDept = locD;      
+                ViewBag.selectedDept = locD;      
             }
             vm.locDepts = new locDept().getLocDeptObjs(storeLoc);
 
@@ -68,19 +68,20 @@ namespace WiwAPISite.Controllers
                     vm.EndDate = Convert.ToDateTime(EndDate);
 
                 vm.storeLoc = storeLoc;
-                vm.locDept = locD;
+                vm.selectedDept = Request.Form["selectedDept"];
 
                 SessionVar.SetString("storeLoc", Request.Form["storeLoc"]);
-                SessionVar.SetString("locDept", Request.Form["locDept"]);
+                SessionVar.SetString("selectedDept", Request.Form["selectedDept"]);
 
-                vm.EmpHourlist = new EmpTime().getEmpSumHours(vm.StartDate, vm.EndDate, vm.storeLoc, vm.locDept);
+                vm.EmpHourlist = new EmpTime().getEmpSumHours(vm.StartDate, vm.EndDate, vm.storeLoc, vm.selectedDept);
 
                 if (vm.EmpHourlist.Count == 0) 
                 ViewBag.ResultTitle = "No data found!";
                 else
                 {
-                    ViewBag.ResultTitle = "Associate time report for store " + Request.Form["storeLoc"] + ", department " + Request.Form["locDept"] + " from " + Request.Form["StartDate"] + " to " + Request.Form["EndDate"];
+                    // ViewBag.ResultTitle = "Associate time report for store " + Request.Form["storeLoc"] + ", department " + Request.Form["selectedDept"] + " from " + Request.Form["StartDate"] + " to " + Request.Form["EndDate"];
                     // ViewBag.ResultTitle2 =  " From:"   +   Request.Form["StartDate"] + " to " + Request.Form["EndDate"];
+                    ViewBag.ResultTitle = "";
                 }
                
             }
@@ -103,18 +104,23 @@ namespace WiwAPISite.Controllers
                     vm.EndDate = myEdate;
 
                     vm.storeLoc = SessionVar.GetString("storeLoc");
-                    vm.locDept = SessionVar.GetString("locDept");
+                    vm.selectedDept = SessionVar.GetString("selectedDept");
+
+                    //
+                    vm.locDepts = new locDept().getLocDeptObjs(vm.storeLoc);
 
                     //return to prviouse selection
                     ViewBag.storeLoc = SessionVar.GetString("storeLoc");
-                    ViewBag.locDept = SessionVar.GetString("locDept");
+                    ViewBag.selectedDept = SessionVar.GetString("selectedDept");
                     ViewBag.startDate = mySdate;
                     ViewBag.endDate = myEdate;
 
-                    vm.EmpHourlist = new EmpTime().getEmpSumHours(mySdate, myEdate, vm.storeLoc, vm.locDept);
 
-                    ViewBag.ResultTitle = "Associate time report for store " + vm.storeLoc + ", department " + vm.locDept  + " from " + mySdate + " to " + myEdate;
 
+                    vm.EmpHourlist = new EmpTime().getEmpSumHours(mySdate, myEdate, vm.storeLoc, vm.selectedDept);
+
+                    // ViewBag.ResultTitle = "Associate time report for store " + vm.storeLoc + ", department " + vm.selectedDept + " from " + mySdate + " to " + myEdate;
+                    ViewBag.ResultTitle = "";
                 }
                 else
                 {  //firsttime get th
