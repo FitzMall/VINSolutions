@@ -13,15 +13,12 @@ namespace WiwAPISite.Controllers
     {
         // GET: Report
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public ActionResult Index(string startDate, string endDate, string login="lish")
+        public ActionResult Index(string startDate, string endDate, string login)
         {
             DateTime mySdate;
             DateTime myEdate;
-            ViewBag.userId = login;
-           
-            SessionVar.SetString("UserId", login );
-            var vm = new EmpTimesViewModel();
 
+            var vm = new EmpTimesViewModel();
 
             //dropdowns
             string storeLoc = Request.Form["storeLoc"];
@@ -55,6 +52,7 @@ namespace WiwAPISite.Controllers
             {
                 var StartDate = Request.Form["StartDate"];
                 var EndDate = Request.Form["EndDate"];
+
                 ViewBag.userId = Request.Form["UserId"];
                 SessionVar.SetString("UserId", Request.Form["UserId"]);
 
@@ -70,10 +68,24 @@ namespace WiwAPISite.Controllers
                 vm.storeLoc = storeLoc;
                 vm.selectedDept = Request.Form["selectedDept"];
 
+
+               
+                var sds = Request.Form["SelectedDepts"];
+
                 SessionVar.SetString("storeLoc", Request.Form["storeLoc"]);
                 SessionVar.SetString("selectedDept", Request.Form["selectedDept"]);
+                SessionVar.SetString("SelectedDepts", Request.Form["SelectedDepts"]);
+               
+                //  vm.EmpHourlist = new EmpTime().getEmpSumHours(vm.StartDate, vm.EndDate, vm.storeLoc, vm.selectedDept);
+                vm.EmpHourlist = new EmpTime().getEmpSumHours(vm.StartDate, vm.EndDate, vm.storeLoc, sds);
 
-                vm.EmpHourlist = new EmpTime().getEmpSumHours(vm.StartDate, vm.EndDate, vm.storeLoc, vm.selectedDept);
+                //ViewBag.SelectedDepts =  sds.Split(',');
+                if (sds != null)
+                {
+                  vm.SelectedDepts = sds.Split(',');
+                  ViewBag.SelectedDepts = sds.Split(',');
+                }
+                
 
                 if (vm.EmpHourlist.Count == 0) 
                 ViewBag.ResultTitle = "No data found!";
@@ -108,23 +120,34 @@ namespace WiwAPISite.Controllers
 
                     //
                     vm.locDepts = new locDept().getLocDeptObjs(vm.storeLoc);
+                    vm.SelectedDepts = SessionVar.GetString("SelectedDepts").Split(',').ToArray();
+
+
 
                     //return to prviouse selection
                     ViewBag.storeLoc = SessionVar.GetString("storeLoc");
                     ViewBag.selectedDept = SessionVar.GetString("selectedDept");
+                   // ViewBag.SelectedDepts = new IEnumerable<locDept>( new { });
+
+
                     ViewBag.startDate = mySdate;
                     ViewBag.endDate = myEdate;
 
+                   
 
-
-                    vm.EmpHourlist = new EmpTime().getEmpSumHours(mySdate, myEdate, vm.storeLoc, vm.selectedDept);
+                    vm.EmpHourlist = new EmpTime().getEmpSumHours(mySdate, myEdate, vm.storeLoc, SessionVar.GetString("SelectedDepts"));
 
                     // ViewBag.ResultTitle = "Associate time report for store " + vm.storeLoc + ", department " + vm.selectedDept + " from " + mySdate + " to " + myEdate;
                     ViewBag.ResultTitle = "";
+                    ViewBag.userId = SessionVar.GetString("UserId");
                 }
                 else
                 {  //firsttime get th
                     vm.EmpHourlist = null;
+
+                    ViewBag.userId = login;
+                    SessionVar.SetString("UserId", login);
+
                 }
             }
             
@@ -134,7 +157,7 @@ namespace WiwAPISite.Controllers
 
 
         [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post)]
-        public ActionResult HourDetails(string loc, string empCode, string start, string end)
+        public ActionResult HourDetails(string empDept, string empCode, string start, string end)
         {
             DateTime mySdate;
             DateTime myEdate;
@@ -162,8 +185,9 @@ namespace WiwAPISite.Controllers
 
             ViewBag.startDate = start;
             ViewBag.endDate = end;
+           
             var vm = new EmpTimesViewModel();
-            vm.EmpHourlist = new EmpTime().getEmpDetailHours(mySdate, myEdate, empCode); 
+            vm.EmpHourlist = new EmpTime().getEmpDetailHours(mySdate, myEdate, empCode, empDept); 
             return View(vm);
         }
 

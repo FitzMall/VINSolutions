@@ -8,6 +8,7 @@ using WiwAPISite.DAL;
 using WiwAPISite;
 using NLog;
 using DapperORM;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace WiwAPISite.Models
 {
@@ -21,8 +22,8 @@ namespace WiwAPISite.Models
         public List<locDept> locDepts { get; set; }
 
 
-
-       // public string[] SelectedBrands { get; set; }
+        [NotMapped]
+        public string[] SelectedDepts { get; set; }
 
 
         [Required(ErrorMessage = "StartDate is required")]
@@ -95,20 +96,19 @@ namespace WiwAPISite.Models
 
         }
 
-        public List<EmpTime> getEmpDetailHours(DateTime? start, DateTime? end, string EmpCode)
+        public List<EmpTime> getEmpDetailHours(DateTime? start, DateTime? end, string EmpCode, string EmpDept)
         {
 
             //
             try
             {
-
-
                 string st = "usp_RPT_EMPWorkHours_detail";
 
                 var p = new DynamicParameters();
                 p.Add("startDate", start);
                 p.Add("endDate", end);
                 p.Add("EMPCODE", EmpCode);
+                p.Add("EmpDept", EmpDept);
 
 
                 List<EmpTime> rs = SqlMapperUtil.StoredProcWithParams<EmpTime>(st, p, mycon196);

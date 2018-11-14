@@ -61,15 +61,15 @@
                             <th>Department</th>*@
                             <th>AssociateName</th>
                             <th>Date</th>
-                            <th>Scheduled Start</th>
-                            <th>Punch In</th>
-                            <th>Meal Out</th>
-                            <th>Meal In</th>
-                            <th>Punch Out</th>
+                            <th>Scheduled <br />Start</th>
+                            <th>Punch <br/>In</th>
+                            <th>Meal <br/>Out</th>
+                            <th>Meal <br/>In</th>
+                            <th>Punch <br/>Out</th>
                        
-                            <th>Schedule End</th> 
-                            <th>Punched Hours</th>
-                            <th>Scheduled Hours</th>
+                            <th>Schedule <br/>End</th> 
+                            <th>Punched <br/>Hours</th>
+                            <th>Scheduled<br/> Hours</th>
                             <th>Variance</th>
                         </tr>
                     </thead>
@@ -110,8 +110,7 @@
                             <td>@Html.DisplayFor(modelItem => rs.MEAL_IN)</td>
                             <td>@Html.DisplayFor(modelItem => rs.PUNCH_OUT)</td>
 
-                            <td>@Html.DisplayFor(modelItem => rs.Sch_End)</td>
-
+                            <td> @Html.DisplayFor(modelItem => rs.Sch_End)</td>
                             <td> @Html.DisplayFor(modelItem => rs.REYHours)</td>
                             <td> @Html.DisplayFor(modelItem => rs.WIWHours)</td>
                             <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
