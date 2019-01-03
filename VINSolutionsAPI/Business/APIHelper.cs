@@ -43,12 +43,26 @@ namespace VINSolutionsAPI.Business
                 new MediaTypeWithQualityHeaderValue("application/json"));
 
                 // List data response.
-                HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!        
+                //HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!   
+
+                // List data response.
+                HttpResponseMessage response = new HttpResponseMessage();
+                response.Headers.Add("charset", "utf-8");
+                response = client.GetAsync(urlParameters).Result;  // Blocking call!
+                response.Content.Headers.ContentType.CharSet = "utf-8";
+
+
                 if (response.IsSuccessStatusCode)
                 {
                     // Parse the response body. Blocking!
-                    var returnModels = response.Content.ReadAsAsync<IEnumerable<AppointmentModel>>().Result;
+                    //var returnModels = response.Content.ReadAsAsync<IEnumerable<AppointmentModel>>().Result;
+                    //return returnModels;
+                    // Parse the response body. Blocking!
+                    string jsonString = response.Content.ReadAsStringAsync().Result;
+                    var returnModels = JsonConvert.DeserializeObject<IEnumerable<AppointmentModel>>(jsonString);
                     return returnModels;
+
+
                 }
                 else
                 {
@@ -313,7 +327,7 @@ namespace VINSolutionsAPI.Business
                 client.DefaultRequestHeaders.Accept.Add(
             new MediaTypeWithQualityHeaderValue("application/json"));
 
-                // List data response.
+                // List data response. 
                 // HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
 
                 // List data response.
@@ -348,7 +362,7 @@ namespace VINSolutionsAPI.Business
                 errorMessage = errorMessage + "Leads API - " + ex.Message + "/n";
                 Logger.Error("Error: Lead API failed:" + errorMessage);
                 uMailer.ApiErrorAlert(errorMessage).Send();
-                return null;
+                 return null;
             }
         }
 
@@ -796,12 +810,23 @@ namespace VINSolutionsAPI.Business
             new MediaTypeWithQualityHeaderValue("application/json"));
 
             //List data response.
-            HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+            //HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
+            
+            // List data response.
+            HttpResponseMessage response = new HttpResponseMessage();
+            response.Headers.Add("charset", "utf-8");
+            response = client.GetAsync(urlParameters).Result;  // Blocking call!
+            response.Content.Headers.ContentType.CharSet = "utf-8";
+
             if (response.IsSuccessStatusCode)
             {
-                // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<UserAccessModel>>().Result;
+                // Parse the response body. Blocking!        
+                //var returnModels = response.Content.ReadAsAsync<IEnumerable<UserAccessModel>>().Result;
+                //return returnModels;
+                string jsonString = response.Content.ReadAsStringAsync().Result;
+                var returnModels = JsonConvert.DeserializeObject<IEnumerable<UserAccessModel>>(jsonString);
                 return returnModels;
+
             }
             else
             {

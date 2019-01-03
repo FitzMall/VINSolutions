@@ -1,17 +1,59 @@
 ﻿@model WiwAPISite.Models.EmpTimesViewModel
 @using WiwAPISite.Helper;
+
 @{
 
     //Layout = "~/Views/Shared/_AppraisalReportLayout.cshtml";
     ViewBag.Title = "Index";
+
     var now = DateTime.Now;
     var startOfMonth = new DateTime(now.Year, now.Month, 1);
 
-    var startdt = now.AddDays(-14);
-    var enddt = now; // now.AddDays(-14);
+    //set start date and end date
+    DateTime startdt = new DateTime(2018, 01, 01);  // now.AddDays(-14);
+    DateTime enddt = new DateTime(2018, 01, 01);  //now; // now.AddDays(-14);
+
+    //last Pay period
+    //var lastStartDate = new DateTime(2018, 12, 03);
+    //DateTime.Parse(ViewBag.LastPayEnd); //
+    // var lpd = ViewBag.LastPayEnd;  //new DateTime(2018, 12, 16);
+
+    int LY = Int32.Parse(ViewBag.LastPY.ToString());
+    int LM = Int32.Parse(ViewBag.LastPM.ToString());
+    int LD = Int32.Parse(ViewBag.LastPD.ToString());
+
+    // DateTime lastEndDate = DateTime.ParseExact(dtStr, "yyyy-MM-dd", System.Globalization.CultureInfo.InvariantCulture);
+    var lastEndDate = new DateTime(LY, LM, LD); //ViewBag.LastPayEnd;
+
+
+    var lastStartDate = lastEndDate.AddDays(-13);  // new DateTime(2018, 12, 03);
+
+
+    var mydiff = (now - lastEndDate).Days;
+
+    if (mydiff < 13)
+    {
+        enddt = lastEndDate;
+        startdt = enddt.AddDays(-13);
+    }
+    else
+    {  //todo
+        startdt = now.AddDays(-14);
+        enddt = now;
+    }
+
+
+    var preSD1 = lastStartDate.AddDays(-14);
+    var preSD2 = preSD1.AddDays(-14);
+    var preSD3 = preSD2.AddDays(-14);
+
+
+    var preED1 = preSD1.AddDays(13);
+    var preED2 = preSD2.AddDays(13);
+    var preED3 = preSD3.AddDays(13);
+
 
     var myStartDate = String.Format("{0:yyyy-MM-dd}", Model.StartDate);
-
     var myEndDate = String.Format("{0:yyyy-MM-dd}", Model.EndDate);
 
 
@@ -20,276 +62,413 @@
 
     decimal totDeptVHours = 0m;
 
-}
+    decimal totDeptPHours1 = 0m;
+    decimal totDeptSHours1 = 0m;
 
+    decimal totDeptVHours1 = 0m;
 
-<h3>Fitzgerald Automall Associate Time Report</h3>
-<form action="@Url.Action("Index", "Report")" method="post">
-    <div class="row">
-        <div class="col-lg-12">
+    //int j = 0;
+    //int n = 0;
 
-            <table class="table table-striped table-bordered" style="height: 80px; border-top: solid; border-bottom: solid; border-left: solid; border-right: solid; border-color: lightgray;">
-                <tr>
-                    <td width="40%">
+    var val = "";
+    var UserId = "";
+    // var logId = "";
+
+    if (Request.Cookies["user"] != null)
+    {
+        val = Request.Cookies["user"].Value;
+
+        string[] userInfo = val.Split('=');
+        foreach (string s in userInfo)
+        {
+            UserId = s;
+        }
+    }
+    else
+    {
+        UserId = "";
+    }
+
+    //local test code
+    if (String.IsNullOrEmpty(UserId))
+    {
+        UserId = Request.QueryString["login"];
+    }
+    //local test code
+    if (String.IsNullOrEmpty(UserId))
+    {
+        UserId = ViewBag.UserId;//Request.Form["login"];
+    }
+
+    ViewBag.UserId = UserId;
+    SessionVar.SetString("UserId", UserId);
+ }
+
+@*<h3>
+     Fitzgerald Automall Associate Time Report @UserId -- @SessionVar.GetString("UserId")</h3>
+
+    <h3>Fitzgerald Automall Associate Time Report @lastStartDate.ToShortDateString() -- @preSD1.ToShortDateString() --@preSD2.ToShortDateString() -- @preSD3.ToShortDateString()</h3>
+         <p>
+             @preED1.ToShortDateString() -- @preED2.ToShortDateString() -- @preED3.ToShortDateString() --@mydiff*@
+
+    <h3>Fitzgerald Automall Associate Time Report </h3>
+    <form action="@Url.Action("Index", "Report")" method="post">
+        <div class="row">
+            <div class="col-lg-12 table-bordered">
+
+                <div class="col-md-2" style="border-left:thin;">Pay Period</div>
+                <div class="col-md-4 table-bordered">
+                    <label>
+                        Start Date:
+                    </label>
+                    <input id="StartDate" name="StartDate" value="@(Model.StartDate.ToShortDateString() == "1/1/0001" ? @startdt.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
+                    @Html.ValidationMessageFor(model => model.StartDate)
+                </div>
+                <div class="col-md-4 table-bordered">
+                    <label>
+                        End Date:
+                    </label>
+                    <input id="EndDate" name="EndDate" value="@(Model.EndDate.ToShortDateString() == "1/1/0001" ? @enddt.ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
+                    @Html.ValidationMessageFor(model => model.EndDate)
+                </div>
+                <div class="col-md-2" style="border-right:thin;">
+                    <span>
+                        @*<button type="button" class="btn btn-info" data-toggle="collapse" data-target="#preDates">Add Compare Periods</button>*@
+                    </span>
+                </div>
+            </div>
+
+        </div>
+        <!--start compare rows-->
+        <div id="preDates">
+            <div class="row">
+                <div class="col-lg-12 table-bordered">
+
+                    <div class="col-md-2" style="border-left:thin;">Pay Period</div>
+                    <div class="col-md-4 table-bordered">
                         <label>
                             Start Date:
                         </label>
-                        <input id="StartDate" name="StartDate" value="@(Model.StartDate.ToShortDateString() == "1/1/0001" ? @startdt.ToString("yyyy-MM-dd") : Model.StartDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
-                        @Html.ValidationMessageFor(model => model.StartDate)
-                    </td>
-                    <td width="60%">
+                        <input id="preSD1" name="preSD1" readonly value="@(Model.preSD1.ToShortDateString() == "1/1/0001" ? @preSD1.ToString("yyyy-MM-dd") : Model.preSD1.ToString("yyyy-MM-dd"))" style="width: 150px;  background-color:gainsboro;" />
+
+                    </div>
+                    <div class="col-md-4 table-bordered">
                         <label>
                             End Date:
                         </label>
-                        <input id="EndDate" name="EndDate" value="@(Model.EndDate.ToShortDateString() == "1/1/0001" ? @enddt.ToString("yyyy-MM-dd") : Model.EndDate.ToString("yyyy-MM-dd"))" style="width: 150px;" />
+                        <input id="preED1" name="preED1" readonly value="@(Model.preED1.ToShortDateString() == "1/1/0001" ?  @preED1.ToString("yyyy-MM-dd") : Model.preED1.ToString("yyyy-MM-dd"))" style="width: 150px;  background-color:gainsboro;" />
+
+                    </div>
+                    <div class="col-md-2" style="border-right:thin;">
+                        @*<input id="include_preSD1" name="include_preSD1" type="checkbox" value="true" /> &nbsp;<label for="include_preSD1">Include</label>*@
+
+                        @Html.CheckBoxFor(m => m.incpreSD1)<label for="incpreSD1"> &nbsp; Include This Period</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 table-bordered">
+                    <div class="col-md-2" style="border-left:thin;">Pay Period</div>
+                    <div class="col-md-4 table-bordered">
+                        <label>
+                            Start Date:
+                        </label>
+                        <input id="preSD2" name="preSD2" readonly value="@(Model.preSD2.ToShortDateString() == "1/1/0001" ? @preSD2.ToString("yyyy-MM-dd") : Model.preSD2.ToString("yyyy-MM-dd"))" style="width: 150px;  background-color:gainsboro;" />
+
+                    </div>
+                    <div class="col-md-4 table-bordered">
+                        <label>
+                            End Date:
+                        </label>
+                        <input id="preED2" name="preED2" readonly value="@(Model.preED2.ToShortDateString() == "1/1/0001" ? @preED2.ToString("yyyy-MM-dd") : Model.preED2.ToString("yyyy-MM-dd"))" style="width: 150px;  background-color:gainsboro;" />
                         @Html.ValidationMessageFor(model => model.EndDate)
-                    </td>
+                    </div>
+                    <div class="col-md-2" style="border-right:thin;">
 
-                </tr>
+                        @*<input id="include_preSD2" name="include_preSD2" type="checkbox" value="true" /> &nbsp;<label for="include_preSD2">Include</label>*@
+                        @Html.CheckBoxFor(m => m.incpreSD2)<label for="incpreSD2"> &nbsp; Include This Period</label>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-lg-12 table-bordered">
 
-                <tr>
-                    <td width="40%">
-                        <label>Store Location: </label> @Html.DropDownListFor(m => m.storeLoc, new SelectList(Model.storeLocs, "Loc", "LocName", @ViewBag.storeLoc))
-                    </td>
-                    <td width="60%">
-                        <label>Department: </label>
-                       @*@Html.DropDownListFor(m => m.selectedDept, new SelectList(Model.locDepts, "deptName", "deptName", @ViewBag.selectedDept))
-                        *@
-                     
-                        @Html.ListBoxFor(m => m.SelectedDepts, new MultiSelectList(Model.locDepts, "deptName", "deptName"))
-                   
-                        
-                        
-                       @*@Html.DropDownListFor(m => m.selectedDept, new MultiSelectList(Model.locDepts, "deptName", "deptName"), new { @class = "form-control form-inline chosen-select", multiple = "" , style= "width: 380px !important; max-width: 480px !important;" })*@
- 
-                       @*@Html.ListBoxFor(m => m.locDept, new SelectList(Model.locDepts, "deptName", "deptName", @ViewBag.locDept, new { multiple = "multiple" }))
-                                                @Html.DropDownListFor(n => n.SelectedBrands, new MultiSelectList(SalesCommission.Business.Enums.Brands,"BrandId","Name"), new { @class = "form-control form-inline chosen-select", multiple = "", data_placeholder = "Select Brands..." })
-                                                *@
-                      
-                        @*@if (Model.locDepts != null && Model.locDepts.Count() != 0)
-                        {
-                            @Html.DropDownListFor(m => m.locDept, new SelectList(Model.locDepts, "deptName", "deptName", SessionVar.GetString("locDept")))
-                        }
-                        else
-                        {
-                            <select id="locDept" name="locDept"></select>
-                        }*@
+                    <div class="col-md-2" style="border-left:thin;">Pay Period</div>
+                    <div class="col-md-4 table-bordered">
+                        <label>
+                            Start Date:
+                        </label>
+                        <input id="preSD3" name="preSD3" readonly value="@(Model.preSD3.ToShortDateString() == "1/1/0001" ?  @preSD3.ToString("yyyy-MM-dd") : Model.preSD3.ToString("yyyy-MM-dd"))" style="width: 150px; background-color:gainsboro;" />
 
-                    </td>
-                </tr>
-                <tr>
-                    <td align="center" colspan="2">
+                    </div>
+                    <div class="col-md-4 table-bordered">
+                        <label>
+                            End Date:
+                        </label>
+                        <input id="preED3" name="preED3" readonly value="@(Model.preED3.ToShortDateString() == "1/1/0001" ? @preED3.ToString("yyyy-MM-dd") : Model.preED3.ToString("yyyy-MM-dd"))" style="width: 150px; background-color:gainsboro;" />
+
+                    </div>
+                    <div class="col-md-2" style="border-right:thin;">
+                        @*<input id="include_preSD3" name="include_preSD3" type="checkbox" value="true" /> &nbsp;<label for="include_preSD3">Include</label>*@
+                        @Html.CheckBoxFor(m => m.incpreSD3)<label for="incpreSD3">&nbsp; Include This Period</label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!--end compare rows-->
+        <div class="row">
+            <div class="col-lg-12 table-bordered">
+
+
+                <div class="col-md-4 table-bordered">
+                    <label>Store Location: </label> @Html.DropDownListFor(m => m.storeLoc, new SelectList(Model.storeLocs, "Loc", "LocName", @ViewBag.storeLoc))
+                </div>
+                <div class="col-md-4 table-bordered">
+                    <label>Department: </label>
+
+                    @*@Html.ListBoxFor(m => m.SelectedDepts, new MultiSelectList(Model.locDepts, "deptId", "deptName"))*@
+                    @Html.DropDownListFor(m => m.selectedDept, new SelectList(Model.locDepts, "deptId", "deptName"))
+
+                </div>
+                <div class="col-md-4" style="border-right:thin;">
+                    <input id="LastPY" name="LastPY" type="hidden" value="@ViewBag.LastPY" />
+                    <input id="LastPM" name="LastPM" type="hidden" value="@ViewBag.LastPM" />
+                    <input id="LastPD" name="LastPD" type="hidden" value="@ViewBag.LastPD" />
+
+                    <input id="user" name="user" type="hidden" value="@val" />
+                    <input id="UserId" name="UserId" type="hidden" value="@UserId" />
+                    @ViewBag.CookieUserName
+                    <button type="submit" id="btnSubmit" class="btn btn-primary">
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+        @*<div class="row">
+                <div class="col-lg-12 table-bordered">
+                    <div class="col-md-2">
+
+                    </div>
+                    <div class="col-md-8">
+                        <input id="user" name="user" type="hidden" value="@val" />
                         <input id="UserId" name="UserId" type="hidden" value="@ViewBag.userId" />
                         @ViewBag.CookieUserName
                         <button type="submit" id="btnSubmit" class="btn btn-primary">
                             Submit
                         </button>
+                    </div>
+                    <div class="col-md-2">
 
-                    </td>
-                </tr>
-            </table>
+                    </div>
 
-        </div>
-    </div>
-    <span><strong>@ViewBag.ResultTitle</strong></span>
-    <br/>
-    <br />
-    <div class="row">
-    <div class="col-lg-12">
-       <div class="panel panel-default panel-info">
-             
-            @if (Model.EmpHourlist != null && Model.EmpHourlist.Count>0)
+                </div>
+            </div>*@
+        <br />
+        <span class="text-danger"><strong>@ViewBag.ResultTitle</strong></span>
+        <br />
+
+
+        @if (Model.DeptPPHourlist != null && Model.DeptPPHourlist.Count > 0)
+        {
+            int ppCnt = 0;
+            foreach (var pp in Model.DeptPPHourlist)
             {
+                ppCnt = ppCnt + 1;
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="panel panel-default panel-info">
+                            <table class="table table-bordered table-striped" id="payperiod">
 
-                    <table id="tblData_SUM" class="table table-striped table-bordered order-column">
-                        <thead>
-                            <tr class="primary" style="background-color:lightsteelblue;">
-                                @*<th>Loc</th>*@
-                                <th>Department</th>
-                                <th>AssociateName</th>
-                                <th>Punched Hours</th>
-                                <th>Scheduled Hours</th>
-                                <th>Variance</th>
-                            </tr>
-                        </thead>
-
-                      
-                        @{
-                            var preDept = "";
-                            var curDept = "";
-                            int i = 0;
-                        }
-
-                        @foreach (var rs in Model.EmpHourlist)
-                        {
-                            i = i + 1;
-                            curDept = rs.Dept;
-                            // preDept = rs.Dept;
-
-                                 @*                                
-                                 add a new sub total row
-                                *@
-                            if (preDept != curDept && i != 1)
-                            {
-
-                                <tr class="info" style="background-color:lightsteelblue;">
-                                    <td> &nbsp;</td>
-                                    <td> TOTAL</td>
-                                    <td> @totDeptPHours</td>
-                                    <td> @totDeptSHours</td>
-                                    <td> @totDeptVHours</td>
+                                <thead>
+                                    <tr class="primary" style="background-color:lightsteelblue;">
+                                        <th>Pay Period</th>
+                                        <th>&nbsp;</th>
+                                        <th>Total Punched Hours</th>
+                                        <th>Total Scheduled Hours</th>
+                                        <th>Total Variance</th>
+                                    </tr>
+                                </thead>
+                                <tr>
+                                    <td><a data-toggle="collapse" id="p1" style="cursor: pointer;" data-target="#collapse-P-@ppCnt"> @pp.Pstart.ToShortDateString() -- @pp.Pend.ToShortDateString()<i class="fa fa-caret-down" aria-hidden="true"></i></a></td>
+                                    <td>&nbsp;</td>
+                                    <td><strong>@Html.DisplayFor(modelItem => pp.ReytotalHours_SUM)</strong></td>
+                                    <td><strong>@Html.DisplayFor(modelItem => pp.WIWtotalHours_SUM) </strong></td>
+                                    <td><strong>@Html.DisplayFor(modelItem => pp.HourVariance_SUM) </strong></td>
                                 </tr>
+                                <tr id="collapse-P-@ppCnt" class="collapse" style="background-color:#f5f5f5">
+                                    <td colspan="5">
+                                        <div id="detailRow">
 
-                                //reset to 0
-                                totDeptPHours = 0m;
-                                totDeptSHours = 0m;
-                                totDeptVHours = 0m;
-   
-                            }
+                                            @if (Model.EmpHourlist != null && Model.EmpHourlist.Count > 0)
+                                            {
+                                                <table id="tblData_SUM" class="table table-striped table-bordered order-column">
+                                                    <thead>
+                                                        <tr class="primary" style="background-color:lightgrey">
 
+                                                            @*<th>Pay Period</th>*@
+                                                            <th>Department</th>
+                                                            <th>AssociateName</th>
+                                                            <th>Punched Hours</th>
+                                                            <th>Scheduled Hours</th>
+                                                            <th>Variance</th>
+                                                        </tr>
+                                                    </thead>
 
-                        var empname = rs.EMPName.ToString();
-                        var classname = "emp-" + @rs.Loc + "-" + @rs.EMPCode;
-
-
-                        totDeptPHours = totDeptPHours + rs.ReytotalHours;
-                        totDeptSHours = totDeptSHours + rs.WIWTotalHours;
-                        totDeptVHours = totDeptVHours + rs.HourVariance;
-
-
-                            <tr>
-                                @*<td> @Html.DisplayFor(modelItem => rs.Loc)  info</td>*@
-                                <td> @Html.DisplayFor(modelItem => rs.Dept)</td>
-                                <td>                                                              
-                                  <a href="@Url.Action("HourDetails", "Report", new { empDept = @rs.Dept, empCode = @rs.EMPCode, start = @myStartDate, end = @myEndDate })" >@Html.DisplayFor(modelItem => rs.EMPName)</a>
-                                </td>
-                                <td> @Html.DisplayFor(modelItem => rs.ReytotalHours)</td>
-                                <td> @Html.DisplayFor(modelItem => rs.WIWTotalHours)</td>
-                                <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
-                            </tr>
+                                                    @foreach (var rs in Model.EmpHourlist.Where(item => item.Pstart.ToShortDateString() == pp.Pstart.ToShortDateString()))
+                                                    {
 
 
-                         
-                                   
-                                  preDept = curDept;
-                             }
+                                                        var ppstart = String.Format("{0:yyyy-MM-dd}", rs.Pstart);
+                                                        var ppend = String.Format("{0:yyyy-MM-dd}", rs.Pend);
+                                                        var logId = UserId;
+                                                        <tr>
+                                                            @*<td>@rs.Pstart.ToShortDateString() -- @rs.Pend.ToShortDateString() </td>*@
+                                                            <td>@Html.DisplayFor(modelItem => rs.Dept)</td>
+                                                            <td>
 
-                          
-                                <tr class="info" style="background-color:lightsteelblue;">
+                                                                <a href="@Url.Action("HourDetails", "Report", new { empDeptId = @rs.DeptId, empCode = @rs.EMPCode, start = @ppstart, end =@ppend, login=@logId})">@Html.DisplayFor(modelItem => rs.EMPName)</a>
 
-                                    <td> &nbsp;</td>
-                                    <td> TOTAL</td>
-                                    <td> @totDeptPHours</td>
-                                    <td> @totDeptSHours</td>
-                                    <td> @totDeptVHours</td>
+                                                            </td>
+
+                                                            <td> @Html.DisplayFor(modelItem => rs.ReytotalHours)</td>
+
+                                                            <td> @Html.DisplayFor(modelItem => rs.WIWTotalHours)</td>
+
+                                                            <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
+                                                        </tr>
+
+
+                                                    }
+
+                                                </table>
+
+                                            }
+
+                                        </div>
+                                    </td>
                                 </tr>
-                   </table>
+                            </table>
+                        </div> <!--panel-info -->
+                    </div>
+                </div>
+            }   <!--end foreach PP-->
+        }  <!--end if PPlist count >0-->
+    </form>
+
+
+    <script type="text/javascript" charset="utf-8">
+
+        $(document).ready(function () {
+
+            //useing  $.jStorage to share userinfo between classic asp and .NET
+            //$.jStorage.set("UserId", $('#UserId').val());
+
+
+            //  $('#tblData_SUM').DataTable({
+            //      "lengthMenu": [[ 25, 50, 100], [25, 50, 100]]
+            //  });
+
+            // $(".collapse").collapse('hide');
+
+            $(function () {
+                $("#StartDate").datepicker();
+                $("#EndDate").datepicker();
+
+                //  $("#preSD1").datepicker();
+                //   $("#preED1").datepicker();
+                //   $("#preSD2").datepicker();
+                //   $("#preED2").datepicker();
+                //   $("#preSD3").datepicker();
+                //   $("#preED3").datepicker();
+            });
+
+            $('#btnSubmit').click(function () {
+                var msg = "";
+                var isGood = true;
+
+
+                //alert($('#SelectedDepts').val());
+
+                if ($('#StartDate').val() === "") {
+                    msg = "Please select start date.";
+                    isGood = false;
                 }
-            </div>
-        </div>
-    </div>
-</form>
 
-@*<script src="@Url.Content("~/Scripts/jstorage.js")" type="text/javascript"></script>*@
+                if ($('#EndDate').val() === "") {
 
-<script type="text/javascript" charset="utf-8">
+                    msg = msg + 'Please select end date.';
+                    isGood = false;
+                }
 
-    $(document).ready(function () {
+                //if ($('#SelectedDepts').val() === null) {
 
-        //useing  $.jStorage to share userinfo between classic asp and .NET
-        //$.jStorage.set("UserId", $('#UserId').val());
+                //    msg = msg + "Please select department.";
+                //    isGood = false;
+                //}
 
+                if ($('#selectedDept').val() === null) {
 
-      //  $('#tblData_SUM').DataTable({
-      //      "lengthMenu": [[ 25, 50, 100], [25, 50, 100]]
-      //  });
+                    msg = msg + "Please select department.";
+                    isGood = false;
+                }
 
-        //$(function () {
-        //    $("#SelectedDepts").chosen();
-          
-        //});
+                if (!isGood) {
+                    alert(msg);
+                    return false;
+                }
+            });
 
-        $(function () {
-            $("#StartDate").datepicker();
-            $("#EndDate").datepicker();
-        });
+            //loc change
+            $("#storeLoc").on("change", function () {
+                // alert("??");
+                loadLocDepts($(this).val());
+                // $("#SelectedDepts").chosen();
+            })
+            ////mgr change
+            //$("#ddlMgr").on("change", function () {
+            //    // alert("here");
+            //    loadStoreMgrAso($(this).val());
+            //})
 
-        $('#btnSubmit').click(function () {
-            var msg="" ;
-            var isGood = true;
-
-
-            //alert($('#SelectedDepts').val());
-
-            if ($('#StartDate').val() === "") {               
-                msg = "Please select start date.";
-                isGood = false;
-            }
-
-            if ($('#EndDate').val() === "") {
-               
-                msg = msg + 'Please select end date.';
-                isGood = false;
-            }
-
-            if ($('#SelectedDepts').val() === null) {
-                
-                msg = msg +  "Please select department.";
-                isGood = false;
-            }
-
-            if (!isGood) {
-                alert(msg);
-                return false;
-            }
-        });
-
-        //loc change
-        $("#storeLoc").on("change", function () {
-           // alert("??");
-            loadLocDepts($(this).val());
-            // $("#SelectedDepts").chosen();
-        })
-        ////mgr change
-        //$("#ddlMgr").on("change", function () {
-        //    // alert("here");
-        //    loadStoreMgrAso($(this).val());
-        //})
-
-        function loadLocDepts(loc) {
-            //console.log(loc);
-            //alert(val);
-              $.getJSON('@Url.Action("getDeptsForLoc", "Report")' + "?storeLoc=" + loc, function (result) {
+            function loadLocDepts(loc) {
+                //console.log(loc);
+                @*$.getJSON('@Url.Action("getDeptsForLoc", "Report")' + "?storeLoc=" + loc, function (result) {
                   $("#SelectedDepts").html("");   // makes select null before filling process
-                
+
                  var data = result.data;
                  for (var i = 0; i < data.length; i++) {
                      // result[0].["deptName"]
                      $("#SelectedDepts").append("<option>" + data[i] + "</option>")
-                 }
+                 }*@
 
-               
+                var myurl = "@Url.Action("getDeptsForLoc", "Report")?storeLoc=" + loc;
 
-        })
-      
-        
+                $.ajax({
+                    url: myurl,
+                    type: 'GET',
 
-        }
-    });
+                    dataType: 'json',
+                    contentType: 'application/json',
+                    success: onSuccessCallback
+
+                }); //end .ajax
+
+                function onSuccessCallback(data) {
+                    // alert(data);
+                    //$("#SelectedDepts").html("");   // makes select null before filling process
+                    $("#selectedDept").html("");
+                    $.each(data, function (i, result) {
+                        //var mydate = new Date(parseInt(result.LastUpdated.substr(6)));
+                        //  $("#SelectedDepts").append("<option value=" + result.deptId + ">" + result.deptName + "</option>")
+                        $("#selectedDept").append("<option value=" + result.deptId + ">" + result.deptName + "</option>")
+
+                    });
+                };
+
+            }
+
+        });
 
 
-    function handle(e) {
-        if (e.keyCode === 13) {
-            e.preventDefault(); // Ensure it is only this code that rusn
-            // alert(this.id);
-            // alert("Enter was pressed was presses");
-            //  alert(id.id);
-        }
-        //var myid = this.id;
-        //$("#TxtBox_" + myid).keyup(function () {
-        //    alert(this.value);
-        //});
-    }
-
-
-</script>
+    </script>
