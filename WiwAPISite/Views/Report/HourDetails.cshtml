@@ -54,7 +54,7 @@
 
 }
 
-<h3>Fitzgerald Automall Associate Time Detail - From @mystartdt To @myenddt   === logID @UserId</span></h3>
+<h3>Fitzgerald Automall Associate Time Detail - From @mystartdt To @myenddt  </span></h3>
 
 <div class="row">
         <div class="col-lg-4"><text>@ViewBag.login</text>
@@ -148,7 +148,7 @@
                             <td> @Html.DisplayFor(modelItem => rs.WIWHours)</td>
                             <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
 
-                            <td><input type="text" id="@frmId" name="@frmId" value="" size="20" onkeypress="handle(event)" /></td>
+                            <td><input type="text" id="@frmId" name="@frmId" value="@Html.DisplayFor(modelItem => rs.MgrComment)" size="20" onkeypress="handle(event)" /></td>
                         </tr>
 
                     }
