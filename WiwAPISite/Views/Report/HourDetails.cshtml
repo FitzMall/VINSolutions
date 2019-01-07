@@ -148,8 +148,25 @@
                             <td> @Html.DisplayFor(modelItem => rs.WIWHours)</td>
                             <td> @Html.DisplayFor(modelItem => rs.HourVariance)</td>
 
-                            <td><input type="text" id="@frmId" name="@frmId" value="@Html.DisplayFor(modelItem => rs.MgrComment)" size="20" onkeypress="handle(event)" /></td>
-                        </tr>
+                             @*@if (string.IsNullOrEmpty(rs.MgrComment))
+                             {*@
+                                <td>
+                                    <input type="text" id="@frmId" name="@frmId" value="@Html.DisplayFor(modelItem => rs.MgrComment)" size="20" onkeypress="handle(event)" />
+                                    <span style="display: none;">@Html.DisplayFor(modelItem => rs.MgrComment)</span>
+                                   
+                                </td>
+                            @* }
+    else
+     {
+        <td>
+            @Html.DisplayFor(modelItem => rs.MgrComment)
+        </td>
+     }*@
+
+
+
+
+</tr>
 
                     }
                     <tfoot>
@@ -199,27 +216,97 @@
 
 $(document).ready(function() {
 
-    $('#tblData_Detail').DataTable(
+
+    //var table = $('#tblData_Detail').DataTable({
+    //    dom: 'Bfrtip',
+    //            filter: false,
+    //            info: false,
+    //            ordering: false,
+    //            searching: false,
+    //            paging: false
+    //});
+
+    //new $.fn.dataTable.Buttons(table, {
+        
+    //    buttons: [
+    //            {
+    //                extend: 'excelHtml5', footer: true,
+    //                exportOptions: {
+    //                    modifier: {
+    //                        page: 'current'
+    //                    }
+    //                }
+
+    //            },
+    //            {
+    //                extend: 'print', footer: true,
+    //                //orientation: 'landscape',
+    //                exportOptions: {
+    //                    columns: ':visible'
+    //                },
+    //                customize: function (win) {
+    //                    $(win.document.body)
+    //                        .css('font-size', '10pt')
+    //                    $(win.document.body).find('table')
+    //                        .addClass('compact')
+    //                        .css('font-size', 'inherit')
+    //                }
+    //            }
+    //        ]
+    //});
+
+    //table.buttons(1, null).container().appendTo(
+    //    table.table().container()
+    //);
+
+   // var dataTbl;
+
+
+   $('#tblData_Detail').DataTable(
         {
             dom: 'Bfrtip',
+            //stateSave: true,
+            filter: false,
             info: false,
             ordering: false,
             searching: false,
             paging: false,
-                              buttons: [
 
-                                  {
-                                      extend: 'excelHtml5', footer: true,
-                                  },
-                                  //{
-                                  //    extend: 'pdfHtml5', footer: true,
-                                  //    orientation: 'landscape'
-                                  //},
-                                  {
-                                      extend: 'print', footer: true,
-                                      orientation: 'landscape'
-                                  }
-                              ]
+            buttons: [
+                  {
+                      extend: 'excelHtml5', footer: true
+                  },
+
+                   {
+                       extend: 'print', footer: true,
+                       customize: function (win) {
+                           $(win.document.body).find('table').addClass('display').css('font-size', '9px');
+                           //$(win.document.body).find('tr:nth-child(odd) td').each(function(index){
+                           //    $(this).css('background-color','#D0D0D0');
+                           //});
+
+                       },
+                       exportOptions: {
+                           stripHtml: true,
+                           format: {
+                               body: function (inner, coldex, rowdex) {
+                                   if (inner.length >= 0) return inner;
+                                   var el = $.parseHTML(inner);
+                                   var result = '';
+                                   $.each(el, function (index, item) {
+                                       if (item.nodeName == 'text') result = result + item.textContent;
+                                           // if (item.nodeName == 'text') result = result + item.innerText;
+                                       else if (item.nodeName == 'SUP') result = result + item.outerHTML;
+                                       else if (item.nodeName == 'STRONG') result = result + item.outerHTML;
+                                       else if (item.nodeName == 'IMG') result = result + item.outerHTML;
+                                       else result = result + item.innerText;
+                                   });
+                                   return result;
+                               }
+                           }
+                       }
+                   }
+            ]
         }
     );
 
@@ -262,11 +349,27 @@ $(document).ready(function() {
 
         function callback(data) {
             alert(data);
+        
+           // .ajax.reload(
         }
-
+       
     });
 
 });
+
+
+
+    //customize: function ( win ) {
+    //    $(win.document.body)
+    //        .css( 'font-size', '10pt' )
+    //        .prepend(
+    //            '<img src="http://datatables.net/media/images/logo-fade.png" style="position:absolute; top:0; left:0;" />'
+    //        );
+ 
+    //    $(win.document.body).find( 'table' )
+    //        .addClass( 'compact' )
+    //        .css( 'font-size', 'inherit' );
+    //}
 
 </script>
 
