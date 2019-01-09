@@ -82,7 +82,7 @@
                                 <th>Department</th>*@
                             <th>AssociateName</th>
                             <th>Date</th>
-                            <th>Scheduled <br />Start</th>
+                            <th>Schedule <br />Start</th>
                             <th>Punch <br />In</th>
                             <th>Meal <br />Out</th>
                             <th>Meal <br />In</th>
@@ -95,7 +95,7 @@
                             <th>Variance</th>
                             <th>
                                 Comments <br />
-                                <button type="button" id="btnSave" class="btn btn-primary">
+                                <button type="button" id="btnSave" class="btn btn-primary" >
                                     Save Comments
                                 </button>
 
@@ -188,7 +188,7 @@
                             <td style="font-weight:bold;"> @ReySum</td>
                             <td style="font-weight:bold;"> @WiwSum</td>
                             <td style="font-weight:bold;"> @HvariSum</td>
-                            <td>
+                            <td class="notexport">
                                 &nbsp;<button type="button" id="btnSave2" class="btn btn-primary">
                                     Save Comments
                                 </button>
@@ -226,15 +226,76 @@ $(document).ready(function() {
             searching: false,
             paging: false,
 
-            buttons: [
-                  {
-                      extend: 'excelHtml5', footer: true
+            buttons: [          
+                {
+                    extend: 'excelHtml5', footer: true,
+                    //customize: function(xlsx) {
+                    //    var sheet = xlsx.xl.worksheets['sheet1.xml'];
+ 
+                    //    // Loop over the cells in column `C`
+                    //    $('row c[r^="M"]', sheet).each( function () {
+                    //        // Get the value
+                    //        if ( $('is t', this).text() == 'Save Comments' ) {
+                    //           //   $(this).attr( 's', '50' );
+                    //           // $(this).text('hhhh');
+                    //        }
+                    //    });
+                    //},
+
+                    //title: "test title",  
+                    exportOptions: {                      
+                        format: {
+                            header: function (data, columnIdx) {
+                                var myheader = "";
+
+                                if (columnIdx == 12) {
+                                    myheader = "Comments";
+                                }
+                                else if ((columnIdx == 2)) myheader = "Schedule Start";
+                                else if ((columnIdx == 3)) myheader = "Punch In";
+                                else if ((columnIdx == 4)) myheader = "Meal Out";
+                                else if ((columnIdx == 5)) myheader = "Meal In";
+                                else if ((columnIdx == 6)) myheader = "Punch Out";
+                                else if ((columnIdx == 7)) myheader = "Punch Reason";
+                                else if ((columnIdx == 8)) myheader = "Schedule End";
+                                else if ((columnIdx == 9)) myheader = "Punched Hours";
+                                else if ((columnIdx == 10)) myheader = "Scheduled Hours";
+                                else myheader = data; 
+                                return myheader;
+
+                            },
+                            footer: function (data, columnIdx) {
+                                var myfooter = "";
+
+                                if (columnIdx == 12) {
+                                    myheader = "";
+                                }
+                                else if ((columnIdx == 0)) myfooter = "";
+                                else if ((columnIdx == 1)) myfooter = "";
+                                else if ((columnIdx == 2)) myfooter = "";
+                                else if ((columnIdx == 3)) myfooter = "";
+                                else if ((columnIdx == 4)) myfooter = "";
+                                else if ((columnIdx == 5)) myfooter = "";
+                                else if ((columnIdx == 6)) myfooter = "";
+                                else if ((columnIdx == 7)) myfooter = "";
+                                else if ((columnIdx == 8)) myfooter = "TOTAL";
+                               // else if ((columnIdx == 9)) myheader = "Punched Hours";
+                               // else if ((columnIdx == 10)) myheader = "Scheduled Hours";
+                                else myfooter = data;
+                                return myfooter;
+
+                            }
+
+                        }                    
+
+                    }
+               
                                        
                   },
 
                    {
                        extend: 'print', footer: true,
-                       customize: function (win) {
+                       customize: function (win) { 
                            $(win.document.body).find('table').addClass('display').css('font-size', '9px');
                            //$(win.document.body).find('tr:nth-child(odd) td').each(function(index){
                            //    $(this).css('background-color','#D0D0D0');
