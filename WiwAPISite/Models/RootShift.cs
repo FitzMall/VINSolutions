@@ -19,7 +19,7 @@ namespace WiwAPISite.Models
 
     public class Shift
     {
-        public int id { get; set; }
+        public long id { get; set; }
         public int account_id { get; set; }
         public int user_id { get; set; }
         public int location_id { get; set; }
@@ -49,7 +49,7 @@ namespace WiwAPISite.Models
 
     public class FitzShift
     {
-        public int id { get; set; }
+        public long id { get; set; }
         public int account_id { get; set; }
         public int user_id { get; set; }
         public int location_id { get; set; }

@@ -161,10 +161,10 @@ namespace VINSolutionsAPI.Controllers
 
                 //leadstatus, leadstatuscustom,leadsource, no 14 days limit leadstatuscustom
 
-                if (entityname.ToLower() == "leadstatus" || entityname.ToLower() == "leadstatuscustom" || entityname.ToLower() == "leadsource")
+                if (entityname.ToLower() == "leadstatus" || entityname.ToLower() == "leadstatuscustom" || entityname.ToLower() == "leadsource" || entityname.ToLower() == "user" || entityname.ToLower() == "useraccess")
                 {
                     Business.APIHelper.makePull(entityname, mySdate, myEdate);
-                    Logger.Info("Load data end=>> end: " + DateTime.Now + " ***entityname***=" + entityname);
+                    Logger.Info("Load data end???=>> end: " + DateTime.Now + " ***entityname***=" + entityname);
                     return Json("Success", JsonRequestBehavior.AllowGet);
                 }
 

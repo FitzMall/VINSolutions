@@ -1,0 +1,104 @@
+﻿@model WiwAPISite.Models.IISLogViewModel
+
+@{
+    ViewBag.Title = "Index";
+    
+   Layout = "~/Views/Shared/_Layout_IISLog.cshtml";
+}
+
+<h2>Index</h2>
+
+@if (Model.Folderlist != null && Model.Folderlist.Count > 0)
+{
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-default panel-info">
+            <table class="table table-bordered table-striped" id="applist">
+
+                <thead>
+                    <tr class="primary" style="background-color:lightsteelblue;">
+                        <th>wwwRootFolder</th>
+                        <th>&nbsp;Hit Count</th>
+                    </tr>
+                </thead>
+
+                @foreach (var fn in Model.Folderlist)
+                {
+
+                    <tr>
+                        <td>
+                        
+                            <a href="@Url.Action("Apath", "IISLog", new { fn = @fn.wwwRootFolder })"> @Html.DisplayFor(modelItem => fn.wwwRootFolder)</a>
+                        
+                        @*<a data-toggle="collapse" id="p1" style="cursor: pointer;" data-target="#collapse-@fn.wwwRootFolder"><i class="fa fa-caret-down" aria-hidden="true"></i><strong>@Html.DisplayFor(modelItem => fn.wwwRootFolder)</strong></a>*@
+                        
+                        </td>
+                        <td>@Html.DisplayFor(modelItem => fn.hitCnt)</td>
+
+                        @*<td>&nbsp;</td>
+                            <td><a data-toggle="collapse" id="p1" style="cursor: pointer;" data-target="#collapse-P-@pp.wwwRootFolder"><i class="fa fa-caret-down" aria-hidden="true"></i></a></td><td><strong>@Html.DisplayFor(modelItem => pp.wwwRootFolder)</strong></td>
+                            <td><strong></strong></td>*@
+                    </tr>
+                      
+                                    @*<div id="detailRow" id="collapse-@fn.wwwRootFolder" class="collapse" style="background-color:#f5f5f5">
+
+                                            @if (Model.Accesslist != null && Model.Accesslist.Count > 0)
+                                            {
+                                                <table id="tblData_SUM" class="table table-striped table-bordered order-column">
+                                                    <thead>
+                                                        <tr class="primary" style="background-color:lightgrey">
+
+                                                            <th>wwwRootFolder</th>
+
+                                                            <th>Hit Cnt</th>
+
+                                                        </tr>
+                                                    </thead>
+
+                                                    @foreach (var rs in Model.Accesslist.Where(item => item.wwwRootFolder == fn.wwwRootFolder))
+                                                    {
+                                                        <tr>
+                                                            <td> @Html.DisplayFor(modelItem => rs.wwwRootFolder)</td>
+
+
+                                                            <td> @Html.DisplayFor(modelItem => rs.hitCnt)</td>
+                                                        </tr>
+
+                                                    }
+
+                                                </table>
+
+                                            }
+
+                                        </div>*@
+                    
+
+                }   <!--end foreach fn-->
+
+             </table>
+            </div> <!--panel-info -->
+      </div>
+  </div>
+ 
+}  <!--end if Folderlist count >0-->
+
+
+<script type="text/javascript" charset="utf-8">
+
+    $(document).ready(function () {
+        $('#applist').DataTable(
+            {
+
+            
+                stateSave: true,
+                //filter: false,
+                info: true,
+                ordering: true,
+                searching: false,
+                paging: false
+               // "lengthMenu": [[ 25, 50, -1], [ 25, 50, "All"]]
+             }
+           
+           )
+    });
+</script>

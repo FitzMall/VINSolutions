@@ -777,15 +777,25 @@ namespace VINSolutionsAPI.Business
             client.BaseAddress = new Uri(VINSolutionsBaseURL + "/User/1.0");
 
             // Add an Accept header for JSON format.
+          //client.DefaultRequestHeaders.Accept.Add(
+          //new MediaTypeWithQualityHeaderValue("application/json"));
+
+            // Add an Accept header for JSON format.     
+            client.DefaultRequestHeaders.AcceptCharset.Add(new StringWithQualityHeaderValue("utf-8"));
             client.DefaultRequestHeaders.Accept.Add(
-            new MediaTypeWithQualityHeaderValue("application/json"));
+               new MediaTypeWithQualityHeaderValue("application/json"));
+
+
 
             // List data response.
             HttpResponseMessage response = client.GetAsync(urlParameters).Result;  // Blocking call!
             if (response.IsSuccessStatusCode)
             {
                 // Parse the response body. Blocking!
-                var returnModels = response.Content.ReadAsAsync<IEnumerable<UserModel>>().Result;
+                // var returnModels = response.Content.ReadAsAsync<IEnumerable<UserModel>>().Result;
+                // return returnModels;
+                string jsonString = response.Content.ReadAsStringAsync().Result;
+                var returnModels = JsonConvert.DeserializeObject<IEnumerable<UserModel>>(jsonString);
                 return returnModels;
             }
             else

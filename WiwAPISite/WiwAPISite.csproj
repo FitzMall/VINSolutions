@@ -215,6 +215,7 @@
     <Compile Include="App_Start\Startup.Auth.cs" />
     <Compile Include="Controllers\AccountController.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IISLogController.cs" />
     <Compile Include="Controllers\ManageController.cs" />
     <Compile Include="Controllers\ReportController.cs" />
     <Compile Include="DAL\SessionVar.cs" />
@@ -228,6 +229,7 @@
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\EmpTimesViewModel.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\IISLogViewModel.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\RootLocation.cs" />
@@ -323,6 +325,9 @@
     <Content Include="Views\Shared\_Layout-about.cshtml" />
     <Content Include="Views\Shared\ErrorEmpCode.cshtml" />
     <Content Include="Views\Shared\SessionOut.cshtml" />
+    <Content Include="Views\IISLog\Index.cshtml" />
+    <Content Include="Views\Shared\_Layout_IISLog.cshtml" />
+    <Content Include="Views\IISLog\Apath.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
